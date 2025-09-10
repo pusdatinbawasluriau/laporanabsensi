@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Analisis Absensi</title>
+    <!-- Tailwind CSS CDN untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #e5e7eb;
+            font-weight: 600;
+        }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Aplikasi Analisis Data Absensi</h1>
+        <p class="text-gray-600 mb-8 text-center">Unggah file .xls atau .xlsx absensi Anda, lalu proses untuk mendapatkan rekap jam masuk dan jam pulang.</p>
+        
+        <!-- Kontrol Utama Aplikasi -->
+        <div class="space-y-4 md:space-y-0 md:flex md:justify-between md:items-center md:space-x-4 mb-8">
+            <label class="block w-full">
+                <span class="sr-only">Pilih File Absensi</span>
+                <input type="file" id="fileInput" class="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100
+                    transition-colors duration-200" accept=".xls, .xlsx">
+            </label>
+
+            <!-- Menu Pilih Bulan -->
+            <div class="flex-shrink-0 w-full md:w-auto">
+                <select id="monthSelect" class="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                    <option value="">Pilih Bulan (Opsional)</option>
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+            </div>
+            
+            <button id="processButton" class="w-full md:w-auto px-6 py-2 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-colors duration-200">
+                Proses Data
+            </button>
+        </div>
+
+        <div id="loading" class="hidden text-center text-gray-500 my-4">
+            Memproses data, mohon tunggu...
+        </div>
+
+        <!-- Tabel Hasil -->
+        <div id="resultsContainer" class="hidden">
+            <h2 class="text-2xl font-semibold mt-8 mb-4 text-center">Hasil Analisis Absensi</h2>
+            <div class="overflow-x-auto rounded-lg shadow-md">
+                <table id="resultsTable" class="min-w-full bg-white">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3">Nama</th>
+                            <th class="px-6 py-3">Tanggal</th>
+                            <th class="px-6 py-3">Jam Masuk</th>
+                            <th class="px-6 py-3">Jam Pulang</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center mt-6">
+                <button id="downloadButton" class="px-8 py-3 bg-green-600 text-white font-semibold rounded-full shadow-md hover:bg-green-700 transition-colors duration-200">
+                    Unduh File XLS
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kotak Pesan Kustom -->
+    <div id="messageBox" class="message-box">
+        <div id="messageText" class="text-center"></div>
+        <div class="mt-4 text-center">
+            <button id="closeMessageBox" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">OK</button>
+        </div>
+    </div>
+
+    <!-- Library untuk membaca dan menulis file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script>
+        // Mendapatkan referensi elemen HTML
+        const fileInput = document.getElementById('fileInput');
+        const processButton = document.getElementById('processButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const loadingDiv = document.getElementById('loading');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsTableBody = document.querySelector('#resultsTable tbody');
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+        const closeMessageBox = document.getElementById('closeMessageBox');
+
+        // Fungsi untuk menampilkan pesan kustom
+        function showMessage(message) {
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+        }
+
+        // Fungsi untuk menyembunyikan pesan kustom
+        closeMessageBox.addEventListener('click', () => {
+            messageBox.style.display = 'none';
+        });
+
+        // Event listener untuk tombol "Proses Data"
+        processButton.addEventListener('click', () => {
+            if (fileInput.files.length === 0) {
+                showMessage('Silakan pilih file terlebih dahulu.');
+                return;
+            }
+
+            loadingDiv.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            resultsTableBody.innerHTML = '';
+            
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                try {
+                    const data = new Uint8Array(event.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    // Memproses data sesuai aturan
+                    const processedData = processAttendanceData(jsonData);
+
+                    // Menampilkan hasil dan mengaktifkan tombol unduh
+                    renderTable(processedData);
+                    resultsContainer.classList.remove('hidden');
+                    downloadButton.onclick = () => downloadXLS(processedData);
+
+                } catch (e) {
+                    showMessage('Gagal membaca file. Pastikan formatnya benar.');
+                    console.error('Error reading file:', e);
+                } finally {
+                    loadingDiv.classList.add('hidden');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // Fungsi utama untuk memproses data
+        function processAttendanceData(data) {
+            if (data.length < 2) {
+                showMessage('File tidak berisi data yang cukup.');
+                return [];
+            }
+            
+            const headers = data[0];
+            const timeColIndex = headers.findIndex(h => h && h.toLowerCase().includes('tanggal/waktu'));
+            const nameColIndex = headers.findIndex(h => h && h.toLowerCase().includes('nama'));
+
+            if (timeColIndex === -1 || nameColIndex === -1) {
+                showMessage('Kolom "Tanggal/Waktu" atau "Nama" tidak ditemukan. Pastikan nama kolom sesuai.');
+                return [];
+            }
+
+            const dailyRecords = {};
+
+            // Loop melalui setiap baris data (mulai dari baris kedua)
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (!row[timeColIndex] || !row[nameColIndex]) continue;
+
+                const name = row[nameColIndex];
+                const timestamp = row[timeColIndex];
+                const date = new Date(timestamp);
+                
+                // Jika data tanggal/waktu tidak valid, lewati baris ini
+                if (isNaN(date.getTime())) continue;
+
+                // Memperbaiki format tanggal menjadi DD/MM/YYYY
+                const dateString = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+                
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+
+                if (!dailyRecords[name]) {
+                    dailyRecords[name] = {};
+                }
+                if (!dailyRecords[name][dateString]) {
+                    dailyRecords[name][dateString] = { masuk: null, pulang: null };
+                }
+
+                // Logika pemisahan jam masuk dan jam pulang
+                if (hours < 10) {
+                    // Jam masuk (sebelum jam 10:00). Ambil yang terakhir.
+                    const existingMasuk = dailyRecords[name][dateString].masuk;
+                    if (!existingMasuk || timeString > existingMasuk) {
+                        dailyRecords[name][dateString].masuk = timeString;
+                    }
+                } else if (hours >= 13) {
+                    // Jam pulang (setelah jam 13:00). Ambil yang terakhir.
+                    const existingPulang = dailyRecords[name][dateString].pulang;
+                    if (!existingPulang || timeString > existingPulang) {
+                        dailyRecords[name][dateString].pulang = timeString;
+                    }
+                }
+            }
+
+            // Menyusun data hasil dalam format yang mudah ditampilkan
+            const finalData = [];
+            for (const name in dailyRecords) {
+                const dates = Object.keys(dailyRecords[name]).sort();
+                for (const date of dates) {
+                    const record = dailyRecords[name][date];
+                    finalData.push({
+                        Nama: name,
+                        Tanggal: date,
+                        'Jam Masuk': record.masuk || 'tidak melakukan absensi',
+                        'Jam Pulang': record.pulang || 'tidak melakukan absensi'
+                    });
+                }
+            }
+
+            return finalData;
+        }
+
+        // Fungsi untuk merender data ke dalam tabel HTML
+        function renderTable(data) {
+            resultsTableBody.innerHTML = '';
+            if (data.length === 0) {
+                resultsTableBody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-500 py-4">Tidak ada data yang diproses.</td></tr>';
+                return;
+            }
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${item.Nama}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${item.Tanggal}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${item['Jam Masuk']}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${item['Jam Pulang']}</td>
+                `;
+                resultsTableBody.appendChild(row);
+            });
+        }
+
+        // Fungsi untuk mengunduh file XLS
+        function downloadXLS(data) {
+            if (data.length === 0) {
+                showMessage('Tidak ada data untuk diunduh.');
+                return;
+            }
+
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Absensi");
+            XLSX.writeFile(workbook, "rekap_absensi.xlsx");
+        }
+    </script>
+</body>
+</html>
