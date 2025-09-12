@@ -360,12 +360,39 @@
         document.getElementById('kendala_tanggal').min = today;
         document.getElementById('wfa_tanggal').min = today;
 
+        // Function to play a success sound
+        function playSuccessSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (!audioCtx) return; // Web Audio API not supported
+                
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5 note
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); // Start with a gentle volume
+
+                oscillator.start(audioCtx.currentTime);
+                
+                oscillator.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.1); // G5 note
+                
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+                oscillator.stop(audioCtx.currentTime + 0.5);
+            } catch (e) {
+                console.error("Could not play sound:", e);
+            }
+        }
 
         function showModal(title, message, isSuccess = true) {
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').innerHTML = message; // Use innerHTML to parse strong tag
             const iconContainer = document.getElementById('modal-icon');
             if (isSuccess) {
+                playSuccessSound(); // Play sound on success
                 iconContainer.className = 'mx-auto flex items-center justify-center h-20 w-20 mb-2';
                 // PERBAIKAN: Menggunakan SVG animasi ceklis yang ringan dan pasti tampil.
                 iconContainer.innerHTML = `<svg class="animated-checkmark-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none"><path d="M25 50 L45 70 L75 30"/></svg>`;
