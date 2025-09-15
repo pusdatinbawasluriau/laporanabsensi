@@ -110,7 +110,7 @@
                         <option value="ARI AGUNG PRAYITNO">ARI AGUNG PRAYITNO</option>
                         <option value="ARDIANSYAH EKA SAKTI">ARDIANSYAH EKA SAKTI</option>
                         <option value="MARCO ALFINDO MILLA JUNIOR">MARCO ALFINDO MILLA JUNIOR</option>
-                        <option value="ISNITA AULIA SAFITRI">ISNITA AULIA SAFITRI</option>
+                        <option value="ISNita AULIA SAFITRI">ISNITA AULIA SAFITRI</option>
                         <option value="T. AYUDEA RAHMADHANI">T. AYUDEA RAHMADHANI</option>
                         <option value="FITRI RAHMADANI">FITRI RAHMADANI</option>
                         <option value="RACHMATUL AZMI">RACHMATUL AZMI</option>
@@ -477,10 +477,26 @@
                 console.error("Could not play sound:", e);
             }
         }
+        
+        // Helper function to format date to DD/MM/YYYY
+        function formatDate(dateString) {
+            if (!dateString || dateString.indexOf('-') === -1) return dateString;
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
+        }
 
         function generatePdf(data) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            
+            // Helper to parse 'DD/MM/YYYY' string to a valid Date object
+            const parseDateFromDdMmYyyy = (dateStr) => {
+                if (!dateStr || typeof dateStr !== 'string') return new Date(); // Fallback to now
+                const parts = dateStr.split('/');
+                if (parts.length !== 3) return new Date(); // Fallback
+                // new Date(year, monthIndex, day)
+                return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+            };
 
             // --- Get Pegawai, Kabag, and Date Info ---
             const namaPegawai = data.namaPegawai || 'Tidak Ada Data';
@@ -502,11 +518,11 @@
             
             let tanggalIzin;
             if (data.presensiAbsensiText === 'Izin Tidak Hadir') {
-                const tglAwal = new Date(data.tanggalMulai).toLocaleDateString('id-ID', options);
-                const tglAkhir = new Date(data.tanggalSelesai).toLocaleDateString('id-ID', options);
-                tanggalIzin = `${tglAwal} s/d ${tglAkhir}`;
+                const tglAwal = parseDateFromDdMmYyyy(data.tanggalMulai).toLocaleDateString('id-ID', options);
+                const tglAkhir = parseDateFromDdMmYyyy(data.tanggalSelesai).toLocaleDateString('id-ID', options);
+                tanggalIzin = `${tglAwal} s.d ${tglAkhir}`;
             } else {
-                tanggalIzin = new Date(data.tanggalKejadian).toLocaleDateString('id-ID', options);
+                tanggalIzin = parseDateFromDdMmYyyy(data.tanggalKejadian).toLocaleDateString('id-ID', options);
             }
             
             // --- Build PDF Document ---
@@ -535,30 +551,47 @@
             doc.text('Jabatan', 20, 95);
             doc.text(':', 60, 95);
             doc.text(jabatanPegawai, 65, 95);
+            
+            const textBody = `Bermaksud mengajukan permohonan izin untuk ${jenisPresensi.toLowerCase()} dikarenakan ${keterangan} selama ${jumlahHari} pada tanggal ${tanggalIzin}.`;
+            const closingText = 'Demikian Surat Izin ini saya sampaikan, atas perhatian serta izin yang diberikan saya ucapkan terimakasih.';
+            
+            // Justified paragraphs
+            doc.text(textBody, 20, 105, { align: 'justify', maxWidth: 170 });
+            const textBodyDims = doc.getTextDimensions(textBody, { maxWidth: 170, font: doc.getFont(), fontSize: 12 });
+            const closingParagraphY = 105 + textBodyDims.h + 5; // Single space
+            
+            doc.text(closingText, 20, closingParagraphY, { align: 'justify', maxWidth: 170 });
+            const closingTextDims = doc.getTextDimensions(closingText, { maxWidth: 170, font: doc.getFont(), fontSize: 12 });
 
-            const textBody = `Bermaksud mengajukan permohonan izin untuk ${jenisPresensi.toLowerCase()} dikarenakan ${keterangan} pada tanggal ${tanggalIzin} selama ${jumlahHari}.`;
-            const splitText = doc.splitTextToSize(textBody, 170);
-            doc.text(splitText, 20, 105);
 
-            doc.text('Demikian Surat Izin ini saya sampaikan atas perhatian serta izin yang diberikan saya ucapkan terimakasih.', 20, 125);
-
-            // --- Signatures ---
-            const centerPosKabag = 65;
-            const centerPosPegawai = 155;
-
-            doc.text('Mengetahui,', centerPosKabag, 145, { align: 'center' });
+            // --- Signatures (ALIGNED HORIZONTALLY) ---
+            const signStartY = closingParagraphY + closingTextDims.h + 15;
+            const leftSignX = 65;
+            const rightSignX = 155;
+            
+            // "Mengetahui," - Left Side
+            doc.text('Mengetahui,', leftSignX, signStartY, { align: 'center' });
             const jabatanLines = doc.splitTextToSize(jabatanKabag, 80);
-            doc.text(jabatanLines, centerPosKabag, 150, { align: 'center' });
-            
-            doc.text('Hormat Saya,', centerPosPegawai, 150, { align: 'center' });
+            doc.text(jabatanLines, leftSignX, signStartY + 5, { align: 'center' });
 
+            // "Dibuat Oleh," - Right Side
+            doc.text('Dibuat Oleh,', rightSignX, signStartY, { align: 'center' });
+
+            // Spacing for names
+            const nameY = signStartY + 35; // Common Y for names, provides spacing for jabatan
+
+            // Kabag Name & NIP (Left)
             doc.setFont('times', 'bold');
-            doc.text(namaKabag, centerPosKabag, 180, { align: 'center' });
-            doc.text(namaPegawai, centerPosPegawai, 180, { align: 'center' });
-            
+            doc.text(namaKabag, leftSignX, nameY, { align: 'center' });
             doc.setFont('times', 'normal');
-            doc.text(`NIP. ${nipKabag}`, centerPosKabag, 185, { align: 'center' });
-            doc.text(`NIP. ${nipPegawai}`, centerPosPegawai, 185, { align: 'center' });
+            doc.text(`NIP. ${nipKabag}`, leftSignX, nameY + 5, { align: 'center' });
+
+            // Pegawai Name & NIP (Right)
+            doc.setFont('times', 'bold');
+            doc.text(namaPegawai, rightSignX, nameY, { align: 'center' });
+            doc.setFont('times', 'normal');
+            doc.text(`NIP. ${nipPegawai}`, rightSignX, nameY + 5, { align: 'center' });
+
 
             doc.save(`Surat_Izin_${namaPegawai}.pdf`);
         }
@@ -723,24 +756,24 @@
                 switch (selectedPresensiValue) {
                     case 'terlambat_pulang_awal':
                         dataObj.deskripsi = formData.get('terlambat_keterangan');
-                        dataObj.tanggalKejadian = formData.get('terlambat_tanggal');
+                        dataObj.tanggalKejadian = formatDate(formData.get('terlambat_tanggal'));
                         dataObj.jumlahHari = '1 hari';
                         break;
                     case 'izin':
                         dataObj.deskripsi = formData.get('izin_perihal');
-                        dataObj.tanggalMulai = formData.get('izin_tanggal_awal');
-                        dataObj.tanggalSelesai = formData.get('izin_tanggal_akhir');
+                        dataObj.tanggalMulai = formatDate(formData.get('izin_tanggal_awal'));
+                        dataObj.tanggalSelesai = formatDate(formData.get('izin_tanggal_akhir'));
                         dataObj.jumlahHari = formData.get('izin_jumlah_hari');
                         break;
                     case 'kendala_mesin':
                         dataObj.deskripsi = formData.get('kendala_deskripsi');
-                        dataObj.tanggalKejadian = formData.get('kendala_tanggal');
+                        dataObj.tanggalKejadian = formatDate(formData.get('kendala_tanggal'));
                         dataObj.jumlahHari = '1 hari';
                         break;
                     case 'dinas_luar':
                         dataObj.kotaTujuan = formData.get('dinas_kota_tujuan');
-                        dataObj.tanggalMulai = formData.get('dinas_tanggal_pergi');
-                        dataObj.tanggalSelesai = formData.get('dinas_tanggal_pulang');
+                        dataObj.tanggalMulai = formatDate(formData.get('dinas_tanggal_pergi'));
+                        dataObj.tanggalSelesai = formatDate(formData.get('dinas_tanggal_pulang'));
                         dataObj.jumlahHari = formData.get('dinas_jumlah_hari');
                         dataObj.deskripsi = `Perjalanan Dinas ke ${dataObj.kotaTujuan}`;
                         break;
@@ -752,7 +785,7 @@
                         } else if (wfaJenis === 'Pulang') {
                             dataObj.deskripsi = formData.get('wfa_pencapaian_kerja');
                         }
-                        dataObj.tanggalKejadian = formData.get('wfa_tanggal');
+                        dataObj.tanggalKejadian = formatDate(formData.get('wfa_tanggal'));
                         break;
                 }
                 
