@@ -263,7 +263,7 @@
                             </div>
                         </div>
                         <div>
-                             <label for="izin_jumlah_hari" class="block text-sm font-medium text-gray-700 mb-1">Jumlah Hari</label>
+                             <label for="izin_jumlah_hari" class="block text-sm font-medium text-gray-700 mb-1">Jumlah Hari Kerja</label>
                             <input type="text" id="izin_jumlah_hari" name="izin_jumlah_hari" readonly class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm">
                         </div>
                         <div>
@@ -460,24 +460,60 @@
             }
         });
 
-        // Date calculation logic
-        function calculateDays(startDate, endDate, resultElement) {
-            const start = new Date(startDate.value);
-            const end = new Date(endDate.value);
-
-            if (startDate.value && endDate.value && end >= start) {
-                const diffTime = Math.abs(end - start);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Inclusive
-                resultElement.value = `${diffDays} hari`;
-            } else {
+        // --- Date calculation logic ---
+        
+        // Menghitung hari kerja (Senin-Jumat)
+        function calculateWorkDays(startDate, endDate, resultElement) {
+            if (!startDate.value || !endDate.value) {
                 resultElement.value = '';
+                return;
             }
+
+            let start = new Date(startDate.value);
+            let end = new Date(endDate.value);
+
+            if (end < start) {
+                resultElement.value = '';
+                return;
+            }
+
+            let workDays = 0;
+            let currentDate = new Date(start);
+
+            while (currentDate <= end) {
+                const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 6 = Saturday
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    workDays++;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            resultElement.value = `${workDays} hari`;
         }
         
-        dinasPergi.addEventListener('change', () => calculateDays(dinasPergi, dinasPulang, dinasJumlahHari));
-        dinasPulang.addEventListener('change', () => calculateDays(dinasPergi, dinasPulang, dinasJumlahHari));
-        izinAwal.addEventListener('change', () => calculateDays(izinAwal, izinAkhir, izinJumlahHari));
-        izinAkhir.addEventListener('change', () => calculateDays(izinAwal, izinAkhir, izinJumlahHari));
+        // Menghitung total hari (termasuk akhir pekan)
+        function calculateTotalDays(startDate, endDate, resultElement) {
+             if (!startDate.value || !endDate.value) {
+                resultElement.value = '';
+                return;
+            }
+            let start = new Date(startDate.value);
+            let end = new Date(endDate.value);
+
+            if (end < start) {
+                resultElement.value = '';
+                return;
+            }
+            
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Ditambah 1 agar inklusif
+            resultElement.value = `${diffDays} hari`;
+        }
+
+        // Terapkan fungsi perhitungan yang sesuai
+        dinasPergi.addEventListener('change', () => calculateTotalDays(dinasPergi, dinasPulang, dinasJumlahHari));
+        dinasPulang.addEventListener('change', () => calculateTotalDays(dinasPergi, dinasPulang, dinasJumlahHari));
+        izinAwal.addEventListener('change', () => calculateWorkDays(izinAwal, izinAkhir, izinJumlahHari));
+        izinAkhir.addEventListener('change', () => calculateWorkDays(izinAwal, izinAkhir, izinJumlahHari));
 
 
         // Form Submission
