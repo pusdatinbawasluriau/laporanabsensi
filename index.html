@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Laporan Absensi Pegawai Bawaslu Riau</title>
+    <!-- jsPDF Library for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for a clean look -->
@@ -302,9 +304,12 @@
                 <div class="mt-2 px-7 py-3">
                     <p id="modal-message" class="text-sm text-gray-500"></p>
                 </div>
-                <div class="items-center px-4 py-3">
+                <div class="items-center px-4 py-3 space-y-2 sm:space-y-0 sm:flex sm:space-x-2">
                     <button id="closeModal" class="px-4 py-2 bg-orange-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300">
                         OK
+                    </button>
+                    <button id="downloadPdfBtn" class="hidden px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        Download Surat Izin (PDF)
                     </button>
                 </div>
             </div>
@@ -325,61 +330,147 @@
             clockElement.textContent = now.toLocaleTimeString('id-ID', { hour12: false });
         }, 1000);
 
+        // --- Data Pegawai, NIP, dan Jabatan ---
+        const pegawaiData = {
+            'ASMIN SAFARI LUBIS': { nip: '197402182007011006', jabatan: 'KEPALA BAGIAN SEKRETARIAT BAWASLU PROVINSI RIAU' },
+            'TARMIZI': { nip: '197302112005021001', jabatan: 'ANALIS SUMBER DAYA MANUSIA APARATUR AHLI MUDA' },
+            'DONA DONORA': { nip: '198011182005022001', jabatan: 'KEPALA BAGIAN HUKUM, HUBUNGAN MASYARAKAT, DATA DAN INFORMASI' },
+            'GUSHENDRI': { nip: '197508102010011000', jabatan: 'KEPALA BAGIAN PENANGANAN PELANGGARAN DAN PENYELESAIAN SENGKETA PROSES' },
+            'RIZKI KURNIAWAN': { nip: '198111092010011010', jabatan: 'KEPALA BAGIAN ADMINISTRASI BAWASLU PROVINSI RIAU' },
+            'ELVINA ARMISTA': { nip: '1988012020122003', jabatan: 'ANALIS PERKARA HUKUM DAN KEUANGAN APBN AHLI MUSA' },
+            'ASMED EFENDI': { nip: '198503202009011003', jabatan: 'ANALIS SUMBER DAYA MANUSIA APARATUR AHLI MUDA' },
+            'VITRA AULIYA': { nip: '199502272022032002', jabatan: 'ANALIS KEUANGAN' },
+            'ANGGA PRATAMA': { nip: '199006012019021001', jabatan: 'ANALIS HUKUM AHLI PERTAMA' },
+            'ARYAN RIADI': { nip: '199608202022031002', jabatan: 'ANALIS HUKUM AHLI PERTAMA' },
+            'SRI REZEKI KHARIANTI': { nip: '199002012020122006', jabatan: 'ANALIS PERKARA HUKUM' },
+            'LIZA APRIANA': { nip: '198504262009012006', jabatan: 'ANALIS HUBUNGAN ANTAR LEMBAGA' },
+            'SULAIMAN FAKHRUR RAZI': { nip: '199209092020121012', jabatan: 'ANALIS MATERI SIDANG' },
+            'TAMARA ARINDITA': { nip: '199507042020122006', jabatan: 'ANALIS BARANG MILIK NEGARA' },
+            'MUHAMMAD HASANUL ASY\'ARY': { nip: '199511162020121005', jabatan: 'ANALIS HUKUM' },
+            'LAODE MUHAMMAD AULIA': { nip: '199105272019021001', jabatan: 'ANALIS PERKARA HUKUM' },
+            'RESSY PUSPITA SARI': { nip: '199510172020122007', jabatan: 'PENATA LAYANAN OPERASIONAL' },
+            'MUTIARA FRITCILLA PANJAIATAN': { nip: '199804172022032004', jabatan: 'PENATA LAYANAN OPERASIONAL' },
+            'JEKI LEONAR ANDIKA TAMPU BOLON': { nip: '199707112020121003', jabatan: 'ANALIS HASIL PENANGANAN PELANGGARAN' },
+            'ERMALIZHA PUTERI': { nip: '199711042022032002', jabatan: 'AHLI PERTAMA - PENGELOLA PENGADAAN BARANG/JASA' },
+            'AZIZUL HAKIM': { nip: '199811192022031002', jabatan: 'ANALIS PERKARA HUKUM' },
+            'BARITO GRINCA PAHALA SILALAHI': { nip: '199803102022031001', jabatan: 'PENGADMINISTRASI KEUANGAN' },
+            'RAHMANESA': { nip: '199004102015031001', jabatan: 'PENGADMINISTRASI KEUANGAN' },
+            'HABIBULLAH': { nip: '198704182010011006', jabatan: 'PENGELOLA KEUANGAN' },
+            'RIKI PRAYOGI': { nip: '199112012015021002', jabatan: 'PENATA KELOLA PENGAWASAN PEMILIHAN UMUM' },
+            'ROZA FITRI YANI': { nip: '199407272022032001', jabatan: 'ANALIS PENGELOLAAN KEUANGAN APBN' },
+            'ERWINDU BUDI DARMA': { nip: '199410092022031002', jabatan: 'PENGELOLA KEUANGAN' },
+            'ARI AGUNG PRAYITNO': { nip: '199608172022031002', jabatan: 'PENGELOLA KEUANGAN' },
+            'ARDIANSYAH EKA SAKTI': { nip: '200011182022011001', jabatan: 'PELAKSANA/TERAMPIL - PRANATA KEUANGAN APBN' },
+            'MARCO ALFINDO MILLA JUNIOR': { nip: '2000062022011001', jabatan: 'PELAKSANA/TERAMPIL - PRANATA KEUANGAN APBN' },
+            'ISNITA AULIA SAFITRI': { nip: '199708102022032003', jabatan: 'PRANATA KEUANGAN APBN TERAMPIL' },
+            'T. AYUDEA RAHMADHANI': { nip: '199404282017082001', jabatan: 'PENGELOLAAN ANGGARAN DAN PERBENDAHARAAN' },
+            'FITRI RAHMADANI': { nip: '19910211202211024', jabatan: 'AHLI PERTAMA PRANATA HUBUNGAN MASYARAKAT' },
+            'RACHMATUL AZMI': { nip: '19871117202211018', jabatan: 'AHLI PERTAMA - PRANATA KOMPUTER' },
+            'IRHAM': { nip: '19861103202211028', jabatan: 'AHLI PERTAMA - PERENCANA' },
+            'M. HAMIDI MAIZA': { nip: '19850203202211014', jabatan: 'AHLI PERTAMA - ARSIPARIS' },
+            'WILSON SAPUTRA': { nip: '19920803202211019', jabatan: 'AUDITOR AHLI PERTAMA' },
+            'RIRIN SULPIANI': { nip: '19901105202211040', jabatan: 'STATISI AHLI PERTAMA' },
+            'DARUSSALIM': { nip: '19850717202211052', jabatan: 'ANALIS HUKUM AHLI PERTAMA' },
+            'NOVI SULASTRI': { nip: '19891128202211030', jabatan: 'Penata Layanan Operasional' },
+            'NUR ASIAH': { nip: '19900618202211029', jabatan: 'PRANATA KOMPUTER AHLI PERTAMA' },
+            'NURHUDA SYAH': { nip: '19901230202211013', jabatan: 'ANALIS SDM APARATUR AHLI MUDA' },
+            'PUTRI WULAN SARI': { nip: '19901220202211037', jabatan: 'ANALIS SUMBER DAYA MANUSIA APARATUR AHLI PERTAMA' },
+            'RIDUWAN SAPUTRA': { nip: '19950125202211036', jabatan: 'PERENCANA AHLI PERTAMA' },
+            'VERI HIDAYAT': { nip: '19930511202211024', jabatan: 'PENATA LAYANAN OPERASIONAL' },
+            'ZULKARNAIN NASUTION': { nip: '19900317202211019', jabatan: 'ANALIS SUMBER DAYA MANUSIA AHLI PERTAMA' },
+            'HERSYA NOGRAHA PRAMASWARI': { nip: '', jabatan: 'AHLI PERTAMA - ARSIPARIS' },
+            'ZUHRI': { nip: '19840507202211023', jabatan: 'TERAMPIL - PRANATA KOMPUTER' },
+            'ARI SETIAWAN': { nip: '19850621202211000', jabatan: 'ARSIPARIS TERAMPIL' },
+            'EKA PUTRI HERMAYANI TANUWIJAYA': { nip: '19960820202211028', jabatan: 'PENGELOLA LAYANAN OPERASIONAL' },
+            'NASRUN RITONGA': { nip: '19910104202211021', jabatan: 'PENGADMINISTRASI PERKANTORAN' },
+            'HENDRIANTO HERMAWAN': { nip: '19890123202211023', jabatan: 'PENGADMINISTRASI PERKANTORAN' },
+            'FERI SUSANDRA': { nip: '19870114202211024', jabatan: 'PENGADMINISTRASI PERKANTORAN' },
+            'ALFIN RESKI': { nip: '19930810202211023', jabatan: 'PENGADMINISTRASI PERKANTORAN' },
+            'YANIS PRIMA': { nip: '19870925202211023', jabatan: 'PENGADMINISTRASI PERKANTORAN' },
+            'SONI DARMUJIANTO': { nip: '19850802202211028', jabatan: 'PENGADMINISTRASI PERKANTORAN' },
+            'DANDI KURNIAWAN': { nip: '200006202211005', jabatan: 'PENGADMINISTRASI PERKANTORAN' },
+            'JEFRI': { nip: '-', jabatan: 'PRAMUBAKTI' },
+            'ANDRI ALI SAPUTRA': { nip: '-', jabatan: 'PENGEMUDI' }
+        };
+
+        const kepalaBagianInfo = {
+            'RIZKI KURNIAWAN': { jabatan: 'Kepala Bagian Sumber Daya Manusia dan Organisasi', nip: '198111092010011010' },
+            'DONA DONORA': { jabatan: 'Kepala Bagian Hukum, Hubungan masyarakat, Data Informasi', nip: '198011182005022001' },
+            'TARMIZI': { jabatan: 'Kepala Bagian Pencegahan, Parmas dan Humas', nip: '197302112005021001' },
+            'GUSHENDRI': { jabatan: 'Kepala Bagian Penanganan Sengketa dan Pelanggaran Pemilu', nip: '197508102010011000' }
+        };
+
+        const pegawaiToKabag = {
+            'ELVINA ARMISTA': 'RIZKI KURNIAWAN', 'ASMED EFENDI': 'RIZKI KURNIAWAN',
+            'VITRA AULIYA': 'RIZKI KURNIAWAN', 'ANGGA PRATAMA': 'GUSHENDRI',
+            'ARYAN RIADI': 'DONA DONORA', 'SRI REZEKI KHARIANTI': 'RIZKI KURNIAWAN',
+            'LIZA APRIANA': 'TARMIZI', 'SULAIMAN FAKHRUR RAZI': 'GUSHENDRI',
+            'TAMARA ARINDITA': 'RIZKI KURNIAWAN', 'MUHAMMAD HASANUL ASY\'ARY': 'GUSHENDRI',
+            'LAODE MUHAMMAD AULIA': 'DONA DONORA', 'RESSY PUSPITA SARI': 'RIZKI KURNIAWAN',
+            'MUTIARA FRITCILLA PANJAIATAN': 'RIZKI KURNIAWAN', 'JEKI LEONAR ANDIKA TAMPU BOLON': 'GUSHENDRI',
+            'ERMALIZHA PUTERI': 'RIZKI KURNIAWAN', 'AZIZUL HAKIM': 'TARMIZI',
+            'BARITO GRINCA PAHALA SILALAHI': 'RIZKI KURNIAWAN', 'RAHMANESA': 'RIZKI KURNIAWAN',
+            'HABIBULLAH': 'RIZKI KURNIAWAN', 'RIKI PRAYOGI': 'GUSHENDRI',
+            'ROZA FITRI YANI': 'RIZKI KURNIAWAN', 'ERWINDU BUDI DARMA': 'RIZKI KURNIAWAN',
+            'ARI AGUNG PRAYITNO': 'RIZKI KURNIAWAN', 'ARDIANSYAH EKA SAKTI': 'RIZKI KURNIAWAN',
+            'MARCO ALFINDO MILLA JUNIOR': 'RIZKI KURNIAWAN', 'ISNITA AULIA SAFITRI': 'RIZKI KURNIAWAN',
+            'T. AYUDEA RAHMADHANI': 'RIZKI KURNIAWAN', 'FITRI RAHMADANI': 'DONA DONORA',
+            'RACHMATUL AZMI': 'DONA DONORA', 'IRHAM': 'RIZKI KURNIAWAN',
+            'M. HAMIDI MAIZA': 'RIZKI KURNIAWAN', 'WILSON SAPUTRA': 'TARMIZI',
+            'RIRIN SULPIANI': 'GUSHENDRI', 'DARUSSALIM': 'TARMIZI',
+            'NOVI SULASTRI': 'TARMIZI', 'NUR ASIAH': 'DONA DONORA',
+            'NURHUDA SYAH': 'DONA DONORA', 'PUTRI WULAN SARI': 'RIZKI KURNIAWAN',
+            'RIDUWAN SAPUTRA': 'RIZKI KURNIAWAN', 'VERI HIDAYAT': 'DONA DONORA',
+            'ZULKARNAIN NASUTION': 'RIZKI KURNIAWAN', 'HERSYA NOGRAHA PRAMASWARI': 'RIZKI KURNIAWAN',
+            'ZUHRI': 'TARMIZI', 'ARI SETIAWAN': 'RIZKI KURNIAWAN',
+            'EKA PUTRI HERMAYANI TANUWIJAYA': '', 
+            'NASRUN RITONGA': 'RIZKI KURNIAWAN', 'HENDRIANTO HERMAWAN': 'RIZKI KURNIAWAN',
+            'FERI SUSANDRA': 'DONA DONORA', 'ALFIN RESKI': 'GUSHENDRI',
+            'YANIS PRIMA': 'TARMIZI', 'SONI DARMUJIANTO': 'RIZKI KURNIAWAN',
+            'DANDI KURNIAWAN': 'DONA DONORA', 'JEFRI': 'RIZKI KURNIAWAN',
+            'ANDRI ALI SAPUTRA': 'RIZKI KURNIAWAN'
+        };
+        
+        const noPdfDownloadList = [
+            'ASMIN SAFARI LUBIS', 'TARMIZI', 'DONA DONORA', 'GUSHENDRI', 'RIZKI KURNIAWAN'
+        ];
+        
         // Form elements
         const form = document.getElementById('absensiForm');
         const presensiSelect = document.getElementById('presensiAbsensi');
         const dynamicFieldsContainer = document.getElementById('dynamic-fields');
         const allDynamicFields = dynamicFieldsContainer.querySelectorAll(':scope > div');
-
-        // WFA specific elements
         const wfaJenisSelect = document.getElementById('wfa_jenis');
         const wfaMasukFields = document.getElementById('wfa-masuk-fields');
         const wfaPulangFields = document.getElementById('wfa-pulang-fields');
-
-        // Date calculation elements
         const dinasPergi = document.getElementById('dinas_tanggal_pergi');
         const dinasPulang = document.getElementById('dinas_tanggal_pulang');
         const dinasJumlahHari = document.getElementById('dinas_jumlah_hari');
         const izinAwal = document.getElementById('izin_tanggal_awal');
         const izinAkhir = document.getElementById('izin_tanggal_akhir');
         const izinJumlahHari = document.getElementById('izin_jumlah_hari');
-
-        // Modal elements
         const modal = document.getElementById('notificationModal');
         const closeModalBtn = document.getElementById('closeModal');
-        
-        // Submit button elements
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
         const submitBtn = document.getElementById('submitBtn');
         const submitText = document.getElementById('submit-text');
         const loadingSpinner = document.getElementById('loading-spinner');
         const submitIcon = document.getElementById('submit-icon');
 
-
-        // Set minimum date for relevant inputs to today
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('kendala_tanggal').min = today;
-        document.getElementById('wfa_tanggal').min = today;
-
         // Function to play a success sound
         function playSuccessSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (!audioCtx) return; // Web Audio API not supported
-                
+                if (!audioCtx) return;
                 const oscillator = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
-
                 oscillator.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
-                
                 oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5 note
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); // Start with a gentle volume
-
+                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
                 oscillator.start(audioCtx.currentTime);
-                
-                oscillator.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.1); // G5 note
-                
+                oscillator.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.1);
                 gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
                 oscillator.stop(audioCtx.currentTime + 0.5);
             } catch (e) {
@@ -387,15 +478,110 @@
             }
         }
 
-        function showModal(title, message, isSuccess = true) {
+        function generatePdf(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // --- Get Pegawai, Kabag, and Date Info ---
+            const namaPegawai = data.namaPegawai || 'Tidak Ada Data';
+            const pegawaiDetails = pegawaiData[namaPegawai] || { nip: '', jabatan: '' };
+            const nipPegawai = pegawaiDetails.nip;
+            const jabatanPegawai = pegawaiDetails.jabatan;
+            
+            const namaKabag = pegawaiToKabag[namaPegawai] || '';
+            const kabagDetails = kepalaBagianInfo[namaKabag] || { nip: '', jabatan: '' };
+            const nipKabag = kabagDetails.nip;
+            const jabatanKabag = kabagDetails.jabatan;
+
+            const jenisPresensi = data.presensiAbsensiText || 'Tidak Ada Data';
+            const keterangan = data.deskripsi || 'Tidak Ada Data';
+            const jumlahHari = data.jumlahHari || 'Tidak Ada Data';
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date().toLocaleDateString('id-ID', options);
+            
+            let tanggalIzin;
+            if (data.presensiAbsensiText === 'Izin Tidak Hadir') {
+                const tglAwal = new Date(data.tanggalMulai).toLocaleDateString('id-ID', options);
+                const tglAkhir = new Date(data.tanggalSelesai).toLocaleDateString('id-ID', options);
+                tanggalIzin = `${tglAwal} s/d ${tglAkhir}`;
+            } else {
+                tanggalIzin = new Date(data.tanggalKejadian).toLocaleDateString('id-ID', options);
+            }
+            
+            // --- Build PDF Document ---
+            doc.setFont('times', 'normal');
+            doc.setFontSize(12);
+
+            doc.text(`Pekanbaru, ${today}`, 140, 20);
+            
+            doc.text('Hal\t\t: Permohonan Izin', 20, 30);
+            doc.text('Lampiran\t: -', 20, 35);
+            
+            doc.text('Kepada Yth.', 20, 45);
+            doc.text('Kepala Sekretariat Bawaslu Provinsi Riau', 20, 50);
+            doc.text('Di-', 20, 55);
+            doc.text('Pekanbaru', 30, 60);
+
+            doc.text('Dengan hormat,', 20, 70);
+            doc.text('Yang bertanda tangan di bawah ini:', 20, 75);
+
+            doc.text('Nama', 20, 85);
+            doc.text(':', 60, 85);
+            doc.text(namaPegawai, 65, 85);
+            doc.text('NIP', 20, 90);
+            doc.text(':', 60, 90);
+            doc.text(nipPegawai, 65, 90);
+            doc.text('Jabatan', 20, 95);
+            doc.text(':', 60, 95);
+            doc.text(jabatanPegawai, 65, 95);
+
+            const textBody = `Bermaksud mengajukan permohonan izin untuk ${jenisPresensi.toLowerCase()} dikarenakan ${keterangan} pada tanggal ${tanggalIzin} selama ${jumlahHari}.`;
+            const splitText = doc.splitTextToSize(textBody, 170);
+            doc.text(splitText, 20, 105);
+
+            doc.text('Demikian Surat Izin ini saya sampaikan atas perhatian serta izin yang diberikan saya ucapkan terimakasih.', 20, 125);
+
+            // --- Signatures ---
+            const centerPosKabag = 65;
+            const centerPosPegawai = 155;
+
+            doc.text('Mengetahui,', centerPosKabag, 145, { align: 'center' });
+            const jabatanLines = doc.splitTextToSize(jabatanKabag, 80);
+            doc.text(jabatanLines, centerPosKabag, 150, { align: 'center' });
+            
+            doc.text('Hormat Saya,', centerPosPegawai, 150, { align: 'center' });
+
+            doc.setFont('times', 'bold');
+            doc.text(namaKabag, centerPosKabag, 180, { align: 'center' });
+            doc.text(namaPegawai, centerPosPegawai, 180, { align: 'center' });
+            
+            doc.setFont('times', 'normal');
+            doc.text(`NIP. ${nipKabag}`, centerPosKabag, 185, { align: 'center' });
+            doc.text(`NIP. ${nipPegawai}`, centerPosPegawai, 185, { align: 'center' });
+
+            doc.save(`Surat_Izin_${namaPegawai}.pdf`);
+        }
+
+        function showModal(title, message, isSuccess = true, data = null) {
             document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-message').innerHTML = message; // Use innerHTML to parse strong tag
+            document.getElementById('modal-message').innerHTML = message;
+            
+            downloadPdfBtn.style.display = 'none';
             const iconContainer = document.getElementById('modal-icon');
+
             if (isSuccess) {
-                playSuccessSound(); // Play sound on success
+                playSuccessSound();
                 iconContainer.className = 'mx-auto flex items-center justify-center h-20 w-20 mb-2';
-                // PERBAIKAN: Menggunakan SVG animasi ceklis yang ringan dan pasti tampil.
                 iconContainer.innerHTML = `<svg class="animated-checkmark-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none"><path d="M25 50 L45 70 L75 30"/></svg>`;
+                
+                if (data && 
+                    (data.presensiAbsensiText === 'Hadir Terlambat/Pulang Lebih Awal' || data.presensiAbsensiText === 'Izin Tidak Hadir') &&
+                    !noPdfDownloadList.includes(data.namaPegawai)) {
+                    downloadPdfBtn.style.display = 'block';
+                    downloadPdfBtn.onclick = () => generatePdf(data);
+                }
+
             } else {
                 iconContainer.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-2';
                 iconContainer.innerHTML = `<svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
@@ -405,42 +591,35 @@
         
         closeModalBtn.addEventListener('click', () => {
             modal.style.display = 'none';
+            downloadPdfBtn.style.display = 'none';
         });
 
-        // Function to show/hide fields based on selection
         function toggleDynamicFields() {
             const selectedValue = presensiSelect.value;
             allDynamicFields.forEach(field => {
                 if (field.id === `${selectedValue}-fields`) {
                     field.classList.remove('hidden');
-                    // Add 'required' to inputs within the visible section
                     field.querySelectorAll('input, select, textarea').forEach(input => {
-                        // Skip optional fields like file uploads
                         if(input.type !== 'file') {
                              input.required = true;
                         }
                     });
                 } else {
                     field.classList.add('hidden');
-                    // Remove 'required' from inputs in hidden sections
                     field.querySelectorAll('input, select, textarea').forEach(input => {
                         input.required = false;
                     });
                 }
             });
-            // Reset WFA sub-fields specifically
             wfaMasukFields.classList.add('hidden');
             wfaPulangFields.classList.add('hidden');
             wfaMasukFields.querySelector('textarea').required = false;
             wfaPulangFields.querySelector('textarea').required = false;
-             // Set file input for 'terlambat' as not required
             document.getElementById('terlambat_dokumen').required = false;
         }
 
-        // Event listener for main dropdown
         presensiSelect.addEventListener('change', toggleDynamicFields);
         
-        // Event listener for WFA dropdown
         wfaJenisSelect.addEventListener('change', function() {
             const selectedWfa = this.value;
             const rencanaKerja = wfaMasukFields.querySelector('textarea');
@@ -460,77 +639,45 @@
             }
         });
 
-        // --- Date calculation logic ---
-        
-        // Menghitung hari kerja (Senin-Jumat)
         function calculateWorkDays(startDate, endDate, resultElement) {
-            if (!startDate.value || !endDate.value) {
-                resultElement.value = '';
-                return;
-            }
-
+            if (!startDate.value || !endDate.value) { resultElement.value = ''; return; }
             let start = new Date(startDate.value);
             let end = new Date(endDate.value);
-
-            if (end < start) {
-                resultElement.value = '';
-                return;
-            }
-
+            if (end < start) { resultElement.value = ''; return; }
             let workDays = 0;
             let currentDate = new Date(start);
-
             while (currentDate <= end) {
-                const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 6 = Saturday
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                    workDays++;
-                }
+                const dayOfWeek = currentDate.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) { workDays++; }
                 currentDate.setDate(currentDate.getDate() + 1);
             }
             resultElement.value = `${workDays} hari`;
         }
         
-        // Menghitung total hari (termasuk akhir pekan)
         function calculateTotalDays(startDate, endDate, resultElement) {
-             if (!startDate.value || !endDate.value) {
-                resultElement.value = '';
-                return;
-            }
+             if (!startDate.value || !endDate.value) { resultElement.value = ''; return; }
             let start = new Date(startDate.value);
             let end = new Date(endDate.value);
-
-            if (end < start) {
-                resultElement.value = '';
-                return;
-            }
-            
+            if (end < start) { resultElement.value = ''; return; }
             const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Ditambah 1 agar inklusif
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
             resultElement.value = `${diffDays} hari`;
         }
 
-        // Terapkan fungsi perhitungan yang sesuai
         dinasPergi.addEventListener('change', () => calculateTotalDays(dinasPergi, dinasPulang, dinasJumlahHari));
         dinasPulang.addEventListener('change', () => calculateTotalDays(dinasPergi, dinasPulang, dinasJumlahHari));
         izinAwal.addEventListener('change', () => calculateWorkDays(izinAwal, izinAkhir, izinJumlahHari));
         izinAkhir.addEventListener('change', () => calculateWorkDays(izinAwal, izinAkhir, izinJumlahHari));
 
-
-        // Form Submission
         form.addEventListener('submit', function (e) {
             e.preventDefault();
-
-            // Custom validation check
             let isValid = true;
             const requiredFields = form.querySelectorAll('[required]');
             requiredFields.forEach(field => {
-                 let parent = field.closest('.p-4'); // Find the parent container
-                 // Only check for validity if the field is inside a visible container
+                 let parent = field.closest('.p-4');
                  if (parent && !parent.classList.contains('hidden')) {
-                     if (!field.value.trim()) {
-                         isValid = false;
-                     }
-                 } else if (!parent && !field.value.trim()) { // For fields not in a dynamic container (like Nama Pegawai)
+                     if (!field.value.trim()) { isValid = false; }
+                 } else if (!parent && !field.value.trim()) {
                     isValid = false;
                  }
             });
@@ -545,7 +692,6 @@
                 return;
             }
             
-            // Show loading state
             submitText.textContent = 'Mengirim...';
             loadingSpinner.classList.remove('hidden');
             submitIcon.classList.add('hidden');
@@ -574,7 +720,6 @@
                     deskripsi: '',
                 };
 
-                // Kumpulkan data terperinci berdasarkan formulir yang terlihat
                 switch (selectedPresensiValue) {
                     case 'terlambat_pulang_awal':
                         dataObj.deskripsi = formData.get('terlambat_keterangan');
@@ -622,16 +767,13 @@
 
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Penting untuk Web Apps agar tidak ada masalah CORS
+                    mode: 'no-cors',
                     cache: 'no-cache',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dataObj)
                 })
                 .then(res => {
-                    // Dengan no-cors, kita tidak bisa memeriksa respon, jadi kita asumsikan sukses
-                    showModal('Berhasil!', `Laporan absensi atas nama <strong>${dataObj.namaPegawai}</strong> sudah diterima.`);
+                    showModal('Berhasil!', `Laporan absensi atas nama <strong>${dataObj.namaPegawai}</strong> sudah diterima.`, true, dataObj);
                     form.reset();
                     toggleDynamicFields();
                 })
@@ -639,7 +781,6 @@
                     showModal('Gagal', `Terjadi kesalahan saat mengirim data: ${error.message}`, false);
                 })
                 .finally(() => {
-                    // Kembalikan tombol ke keadaan semula
                     submitText.textContent = 'Kirim Laporan';
                     loadingSpinner.classList.add('hidden');
                     submitIcon.classList.remove('hidden');
@@ -655,7 +796,6 @@
             }
         });
         
-        // Inisialisasi tampilan form saat pertama kali dimuat
         toggleDynamicFields();
     });
     </script>
