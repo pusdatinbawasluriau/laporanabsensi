@@ -110,7 +110,7 @@
                         <option value="ARI AGUNG PRAYITNO">ARI AGUNG PRAYITNO</option>
                         <option value="ARDIANSYAH EKA SAKTI">ARDIANSYAH EKA SAKTI</option>
                         <option value="MARCO ALFINDO MILLA JUNIOR">MARCO ALFINDO MILLA JUNIOR</option>
-                        <option value="ISNita AULIA SAFITRI">ISNITA AULIA SAFITRI</option>
+                        <option value="ISNITA AULIA SAFITRI">ISNITA AULIA SAFITRI</option>
                         <option value="T. AYUDEA RAHMADHANI">T. AYUDEA RAHMADHANI</option>
                         <option value="FITRI RAHMADANI">FITRI RAHMADANI</option>
                         <option value="RACHMATUL AZMI">RACHMATUL AZMI</option>
@@ -169,7 +169,7 @@
                             <input type="date" id="terlambat_tanggal" name="terlambat_tanggal" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500">
                         </div>
                         <div>
-                            <label for="terlambat_dokumen" class="block text-sm font-medium text-gray-700 mb-1">Upload Dokumen Pendukung (Opsional)</label>
+                            <label for="terlambat_dokumen" class="block text-sm font-medium text-gray-700 mb-1">Upload Surat Izin yang Sudah Ditandatangani (Opsional)</label>
                             <input type="file" id="terlambat_dokumen" name="terlambat_dokumen" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
                         </div>
                     </div>
@@ -269,7 +269,7 @@
                             <input type="text" id="izin_jumlah_hari" name="izin_jumlah_hari" readonly class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm">
                         </div>
                         <div>
-                            <label for="izin_dokumen" class="block text-sm font-medium text-gray-700 mb-1">Upload Surat Izin/Dokter</label>
+                            <label for="izin_dokumen" class="block text-sm font-medium text-gray-700 mb-1">Upload Surat Izin yang Sudah Ditandatangani (Opsional)</label>
                             <input type="file" id="izin_dokumen" name="izin_dokumen" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
                         </div>
                     </div>
@@ -277,8 +277,11 @@
                 </div>
 
                 <!-- Submit Button -->
-                <div class="pt-4 border-t">
-                    <button type="submit" id="submitBtn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-transform transform hover:scale-105">
+                <div class="pt-4 border-t flex flex-col sm:flex-row gap-4">
+                    <button type="button" id="preDownloadPdfBtn" class="w-full sm:w-auto flex-grow justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105 hidden">
+                        Download Surat Izin
+                    </button>
+                    <button type="submit" id="submitBtn" class="w-full sm:w-auto flex-grow justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-transform transform hover:scale-105 flex items-center">
                         <svg id="submit-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
@@ -452,6 +455,7 @@
         const modal = document.getElementById('notificationModal');
         const closeModalBtn = document.getElementById('closeModal');
         const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+        const preDownloadPdfBtn = document.getElementById('preDownloadPdfBtn');
         const submitBtn = document.getElementById('submitBtn');
         const submitText = document.getElementById('submit-text');
         const loadingSpinner = document.getElementById('loading-spinner');
@@ -649,6 +653,8 @@
             wfaMasukFields.querySelector('textarea').required = false;
             wfaPulangFields.querySelector('textarea').required = false;
             document.getElementById('terlambat_dokumen').required = false;
+            document.getElementById('izin_dokumen').required = false; // Also for izin
+            checkFormValidityForPdf();
         }
 
         presensiSelect.addEventListener('change', toggleDynamicFields);
@@ -701,6 +707,73 @@
         dinasPulang.addEventListener('change', () => calculateTotalDays(dinasPergi, dinasPulang, dinasJumlahHari));
         izinAwal.addEventListener('change', () => calculateWorkDays(izinAwal, izinAkhir, izinJumlahHari));
         izinAkhir.addEventListener('change', () => calculateWorkDays(izinAwal, izinAkhir, izinJumlahHari));
+
+        function checkFormValidityForPdf() {
+            let isReadyForPdf = false;
+            const selectedPresensi = presensiSelect.value;
+            const namaPegawai = document.getElementById('namaPegawai').value;
+
+            // Condition 1: Must be a downloadable user/type
+            if (!namaPegawai || noPdfDownloadList.includes(namaPegawai)) {
+                preDownloadPdfBtn.classList.add('hidden');
+                return;
+            }
+
+            if (selectedPresensi === 'izin') {
+                const perihal = document.getElementById('izin_perihal').value.trim();
+                const tglAwal = document.getElementById('izin_tanggal_awal').value.trim();
+                const tglAkhir = document.getElementById('izin_tanggal_akhir').value.trim();
+                if (perihal && tglAwal && tglAkhir) {
+                    isReadyForPdf = true;
+                }
+            } else if (selectedPresensi === 'terlambat_pulang_awal') {
+                const keterangan = document.getElementById('terlambat_keterangan').value.trim();
+                const tanggal = document.getElementById('terlambat_tanggal').value.trim();
+                if (keterangan && tanggal) {
+                    isReadyForPdf = true;
+                }
+            }
+
+            if (isReadyForPdf) {
+                preDownloadPdfBtn.classList.remove('hidden');
+            } else {
+                preDownloadPdfBtn.classList.add('hidden');
+            }
+        }
+
+
+        form.addEventListener('input', checkFormValidityForPdf);
+
+        preDownloadPdfBtn.addEventListener('click', () => {
+            const formData = new FormData(form);
+            const selectedPresensiValue = presensiSelect.value;
+            const selectedPresensiOption = presensiSelect.options[presensiSelect.selectedIndex];
+            const dataObj = {
+                namaPegawai: formData.get('namaPegawai'),
+                presensiAbsensiText: selectedPresensiOption ? selectedPresensiOption.text : '',
+                deskripsi: '',
+                tanggalKejadian: '',
+                tanggalMulai: '',
+                tanggalSelesai: '',
+                jumlahHari: '',
+            };
+
+            switch (selectedPresensiValue) {
+                case 'terlambat_pulang_awal':
+                    dataObj.deskripsi = formData.get('terlambat_keterangan');
+                    dataObj.tanggalKejadian = formatDate(formData.get('terlambat_tanggal'));
+                    dataObj.jumlahHari = '1 hari';
+                    break;
+                case 'izin':
+                    dataObj.deskripsi = formData.get('izin_perihal');
+                    dataObj.tanggalMulai = formatDate(formData.get('izin_tanggal_awal'));
+                    dataObj.tanggalSelesai = formatDate(formData.get('izin_tanggal_akhir'));
+                    dataObj.jumlahHari = formData.get('izin_jumlah_hari');
+                    break;
+            }
+            
+            generatePdf(dataObj);
+        });
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
