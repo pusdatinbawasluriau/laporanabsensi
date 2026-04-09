@@ -143,7 +143,7 @@
                         <option value="izin">Izin Tidak Hadir</option>
                         <option value="kendala_mesin">Kendala Mesin Absensi</option>
                         <option value="dinas_luar">Dinas Luar</option>
-                        <option value="wfa">WFH (Work From Home)</option>
+                        <option value="wfh">WFH (Work From Home)</option>
                     </select>
                 </div>
 
@@ -188,7 +188,7 @@
                         <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Laporan WFH</h3>
                         <div>
                              <label for="wfh_jenis" class="block text-sm font-medium text-gray-700 mb-1">Jenis Laporan WFH</label>
-                            <select id="wfa_jenis" name="wfh_jenis" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500">
+                            <select id="wfh_jenis" name="wfh_jenis" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500">
                                 <option value="" disabled selected>-- Pilih Jenis Absensi --</option>
                                 <option value="Masuk">Absensi Masuk</option>
                                 <option value="Pulang">Absensi Pulang</option>
@@ -435,9 +435,9 @@
         const presensiSelect = document.getElementById('presensiAbsensi');
         const dynamicFieldsContainer = document.getElementById('dynamic-fields');
         const allDynamicFields = dynamicFieldsContainer.querySelectorAll(':scope > div');
-        const wfaJenisSelect = document.getElementById('wfa_jenis');
-        const wfaMasukFields = document.getElementById('wfa-masuk-fields');
-        const wfaPulangFields = document.getElementById('wfa-pulang-fields');
+        const wfhJenisSelect = document.getElementById('wfh_jenis');
+        const wfhMasukFields = document.getElementById('wfh-masuk-fields');
+        const wfhPulangFields = document.getElementById('wfh-pulang-fields');
         const dinasPergi = document.getElementById('dinas_tanggal_pergi');
         const dinasPulang = document.getElementById('dinas_tanggal_pulang');
         const dinasJumlahHari = document.getElementById('dinas_jumlah_hari');
@@ -640,10 +640,10 @@
                     });
                 }
             });
-            wfaMasukFields.classList.add('hidden');
-            wfaPulangFields.classList.add('hidden');
-            wfaMasukFields.querySelector('textarea').required = false;
-            wfaPulangFields.querySelector('textarea').required = false;
+            wfhMasukFields.classList.add('hidden');
+            wfhPulangFields.classList.add('hidden');
+            wfhMasukFields.querySelector('textarea').required = false;
+            wfhPulangFields.querySelector('textarea').required = false;
             document.getElementById('terlambat_dokumen').required = false;
             document.getElementById('izin_dokumen').required = false; // Also for izin
             checkFormValidityForPdf();
@@ -651,21 +651,21 @@
 
         presensiSelect.addEventListener('change', toggleDynamicFields);
         
-        wfaJenisSelect.addEventListener('change', function() {
-            const selectedWfa = this.value;
-            const rencanaKerja = wfaMasukFields.querySelector('textarea');
-            const pencapaianKerja = wfaPulangFields.querySelector('textarea');
+        wfhJenisSelect.addEventListener('change', function() {
+            const selectedwfh = this.value;
+            const rencanaKerja = wfhMasukFields.querySelector('textarea');
+            const pencapaianKerja = wfhPulangFields.querySelector('textarea');
             
-            wfaMasukFields.classList.add('hidden');
+            wfhMasukFields.classList.add('hidden');
             rencanaKerja.required = false;
-            wfaPulangFields.classList.add('hidden');
+            wfhPulangFields.classList.add('hidden');
             pencapaianKerja.required = false;
 
-            if(selectedWfa === 'Masuk') {
-                wfaMasukFields.classList.remove('hidden');
+            if(selectedwfh === 'Masuk') {
+                wfhMasukFields.classList.remove('hidden');
                 rencanaKerja.required = true;
-            } else if (selectedWfa === 'Pulang') {
-                wfaPulangFields.classList.remove('hidden');
+            } else if (selectedwfh === 'Pulang') {
+                wfhPulangFields.classList.remove('hidden');
                 pencapaianKerja.required = true;
             }
         });
@@ -814,7 +814,7 @@
                     tanggalSelesai: '',
                     jumlahHari: '',
                     kotaTujuan: '',
-                    jenisWFA: '',
+                    jeniswfh: '',
                     deskripsi: '',
                 };
 
@@ -842,15 +842,15 @@
                         dataObj.jumlahHari = formData.get('dinas_jumlah_hari');
                         dataObj.deskripsi = `Perjalanan Dinas ke ${dataObj.kotaTujuan}`;
                         break;
-                    case 'wfa':
-                        const wfaJenis = formData.get('wfa_jenis');
-                        dataObj.jenisWFA = wfaJenis;
-                        if (wfaJenis === 'Masuk') {
-                            dataObj.deskripsi = formData.get('wfa_rencana_kerja');
-                        } else if (wfaJenis === 'Pulang') {
-                            dataObj.deskripsi = formData.get('wfa_pencapaian_kerja');
+                    case 'wfh':
+                        const wfhJenis = formData.get('wfh_jenis');
+                        dataObj.jeniswfh = wfhJenis;
+                        if (wfhJenis === 'Masuk') {
+                            dataObj.deskripsi = formData.get('wfh_rencana_kerja');
+                        } else if (wfhJenis === 'Pulang') {
+                            dataObj.deskripsi = formData.get('wfh_pencapaian_kerja');
                         }
-                        dataObj.tanggalKejadian = formatDate(formData.get('wfa_tanggal'));
+                        dataObj.tanggalKejadian = formatDate(formData.get('wfh_tanggal'));
                         break;
                 }
                 
