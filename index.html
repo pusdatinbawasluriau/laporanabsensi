@@ -146,7 +146,7 @@
                             <option value="" disabled selected>-- Pilih Kategori Laporan --</option>
                             <option value="izin">Izin</option>
                             <option value="dinas-luar">Dinas Luar</option>
-                            <option value="WFH">Work From Home (WFH) / WFH</option>
+                            <option value="wfa">Work From Anywhere (WFA) / WFH</option>
                             <!-- Lupa Absensi dan Kendala Mesin disembunyikan menggunakan inline style -->
                             <option value="lupa-absensi" style="display: none;">Lupa Absensi</option>
                             <option value="kendala-mesin" style="display: none;">Kendala Mesin Absensi</option>
@@ -205,46 +205,46 @@
                             </div>
                         </div>
 
-                        <!-- SEKSI: WFH -->
-                        <div id="WFHSection" class="conditional-section border-l-4 border-orange-500 bg-orange-50/40 rounded-r-xl px-4 py-2 space-y-4">
+                        <!-- SEKSI: WFA -->
+                        <div id="wfaSection" class="conditional-section border-l-4 border-orange-500 bg-orange-50/40 rounded-r-xl px-4 py-2 space-y-4">
                             <div>
-                                <label for="WFHPilihan" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Pilihan Absensi WFH</label>
-                                <select id="WFHPilihan" name="WFHPilihan" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none bg-white">
-                                    <option value="" disabled selected>-- Pilih Opsi Absensi WFH --</option>
+                                <label for="wfaPilihan" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Pilihan Absensi WFA</label>
+                                <select id="wfaPilihan" name="wfaPilihan" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none bg-white">
+                                    <option value="" disabled selected>-- Pilih Opsi Absensi WFA --</option>
                                     <option value="absensi-masuk">Absensi Masuk (Rencana Kerja)</option>
                                     <option value="absensi-pulang">Absensi Pulang (Pencapaian Target)</option>
                                 </select>
                             </div>
                             
-                            <!-- WFH SUBSEKSI: MASUK -->
-                            <div id="WFHMasukSection" class="conditional-section space-y-4">
+                            <!-- WFA SUBSEKSI: MASUK -->
+                            <div id="wfaMasukSection" class="conditional-section space-y-4">
                                 <div>
                                     <label for="rencanaKerja" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Rencana Kerja Hari Ini</label>
                                     <textarea id="rencanaKerja" name="keterangan" rows="3" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none" placeholder="Tuliskan butir rencana kerja mandiri Anda hari ini..."></textarea>
                                 </div>
                                 <div>
-                                    <label for="tanggalWFHMasuk" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Tanggal Absensi</label>
-                                    <input type="date" id="tanggalWFHMasuk" name="tanggal" class="date-input w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none">
+                                    <label for="tanggalWfaMasuk" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Tanggal Absensi</label>
+                                    <input type="date" id="tanggalWfaMasuk" name="tanggal" class="date-input w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none">
                                 </div>
                             </div>
                             
-                            <!-- WFH SUBSEKSI: PULANG -->
-                            <div id="WFHPulangSection" class="conditional-section space-y-4">
+                            <!-- WFA SUBSEKSI: PULANG -->
+                            <div id="wfaPulangSection" class="conditional-section space-y-4">
                                 <div>
                                     <label for="pencapaianKerja" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Pencapaian Target Kerja Hari Ini</label>
                                     <textarea id="pencapaianKerja" name="keterangan" rows="3" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none" placeholder="Tuliskan pencapaian serta tindak lanjut tugas hari ini..."></textarea>
                                 </div>
                                 <div>
-                                    <label for="tanggalWFHPulang" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Tanggal Absensi</label>
-                                    <input type="date" id="tanggalWFHPulang" name="tanggal" class="date-input w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none">
+                                    <label for="tanggalWfaPulang" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Tanggal Absensi</label>
+                                    <input type="date" id="tanggalWfaPulang" name="tanggal" class="date-input w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none">
                                 </div>
                             </div>
 
-                            <!-- WFH LINK INPUT (Penyimpanan Dokumen Laporan Kinerja) -->
-                            <div id="WFHLinkSection" class="conditional-section space-y-2">
+                            <!-- WFA LINK INPUT (Penyimpanan Dokumen Laporan Kinerja) -->
+                            <div id="wfaLinkSection" class="conditional-section space-y-2">
                                 <div>
-                                    <label for="linkGdriveWFH" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Link Penyimpanan Laporan Kinerja (Google Drive)</label>
-                                    <input type="url" id="linkGdriveWFH" name="linkGdriveWFH" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition duration-150 bg-white" placeholder="https://drive.google.com/drive/folders/... atau https://docs.google.com/...">
+                                    <label for="linkGdriveWfa" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Link Penyimpanan Laporan Kinerja (Google Drive)</label>
+                                    <input type="url" id="linkGdriveWfa" name="linkGdriveWfa" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition duration-150 bg-white" placeholder="https://drive.google.com/drive/folders/... atau https://docs.google.com/...">
                                     <p class="text-[10px] text-slate-400 mt-1">Masukkan tautan berkas lapor diri / rencana kerja yang sudah diupload ke Cloud Drive pribadi/instansi.</p>
                                 </div>
                             </div>
@@ -510,7 +510,7 @@
             };
 
             // =========================================================================
-            // DATABASE SANDI ADMINISTRATOR WILAYAH (VERSI RANDOM AMAN)
+            // DATABASE SANDI ADMINISTRATOR WILAYAH
             // =========================================================================
             const sandiWilayah = {
                 "Provinsi Riau": "P_Riau_8273",
@@ -528,7 +528,7 @@
                 "Kabupaten Siak": "Kab_Siak_5561"
             };
 
-            // URL Google Apps Script Anda (Ganti dengan link macro deployment /exec Anda)
+            // URL Google Apps Script
             const scriptURL = 'https://script.google.com/macros/s/AKfycbxR9SwflJ9ZvYMn6q9CC6SV5UazWsZI02aKHFqMCpscSCDRiEDClFtViZbZmDc-lDWj6w/exec';
 
             // =========================================================================
@@ -540,40 +540,32 @@
             const tabRekapContent = document.getElementById('tabRekapContent');
 
             tabInputBtn.addEventListener('click', function () {
-                // Aktifkan tab input
                 tabInputBtn.className = "flex-1 max-w-[220px] flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition duration-200 bg-orange-500 text-white shadow-md shadow-orange-500/20";
                 tabRekapBtn.className = "flex-1 max-w-[220px] flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50";
-                
                 tabInputContent.classList.replace('hidden', 'block');
                 tabRekapContent.classList.replace('block', 'hidden');
             });
 
             tabRekapBtn.addEventListener('click', function () {
-                // Aktifkan tab rekap
                 tabRekapBtn.className = "flex-1 max-w-[220px] flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition duration-200 bg-orange-500 text-white shadow-md shadow-orange-500/20";
                 tabInputBtn.className = "flex-1 max-w-[220px] flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50";
-                
                 tabInputContent.classList.replace('block', 'hidden');
                 tabRekapContent.classList.replace('hidden', 'block');
             });
 
             // =========================================================================
-            // LOGIKA RUNNING REAL-TIME CLOCK (WIB)
+            // SISTEM RUNNING REAL-TIME CLOCK (WIB)
             // =========================================================================
             function updateClock() {
                 const now = new Date();
-                
-                // Konversi tanggal ke WIB (UTC+7)
                 const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
                 const wibTime = new Date(utc + (3600000 * 7));
                 
-                // Ambil string jam
                 const hours = String(wibTime.getHours()).padStart(2, '0');
                 const minutes = String(wibTime.getMinutes()).padStart(2, '0');
                 const seconds = String(wibTime.getSeconds()).padStart(2, '0');
                 document.getElementById('clockTime').textContent = `${hours}:${minutes}:${seconds}`;
 
-                // Ambil string hari dan tanggal
                 const hariMap = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
                 const bulanMap = [
                     "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
@@ -600,7 +592,6 @@
                 const selectedWilayah = this.value;
                 const daftarNama = dbPegawai[selectedWilayah] || [];
 
-                // Reset dropdown pegawai
                 namaPegawaiSelect.innerHTML = `<option value="" disabled selected>-- Pilih Nama Anda --</option>`;
                 
                 if (daftarNama.length > 0) {
@@ -628,23 +619,32 @@
             const sections = {
                 izin: document.getElementById('izinSection'),
                 dinasLuar: document.getElementById('dinasLuarSection'),
-                WFH: document.getElementById('WFHSection'),
-                WFHMasuk: document.getElementById('WFHMasukSection'),
-                WFHPulang: document.getElementById('WFHPulangSection'),
-                WFHLink: document.getElementById('WFHLinkSection')
+                wfa: document.getElementById('wfaSection'),
+                wfaMasuk: document.getElementById('wfaMasukSection'),
+                wfaPulang: document.getElementById('wfaPulangSection'),
+                wfaLink: document.getElementById('wfaLinkSection')
             };
 
-            const WFHPilihanSelect = document.getElementById('WFHPilihan');
+            const wfaPilihanSelect = document.getElementById('wfaPilihan');
 
             function hideAllSections() {
                 Object.values(sections).forEach(sec => sec.classList.remove('visible'));
                 
                 // Hilangkan mode 'required' untuk input kondisional
-                document.getElementById('linkGdriveWFH').required = false;
+                document.getElementById('linkGdriveWfa').required = false;
                 document.getElementById('tanggalMulaiIzin').required = false;
                 document.getElementById('tanggalAkhirIzin').required = false;
                 document.getElementById('tanggalPergi').required = false;
                 document.getElementById('tanggalPulang').required = false;
+                
+                document.getElementById('perihalIzin').required = false;
+                document.getElementById('kotaTujuan').required = false;
+                
+                wfaPilihanSelect.required = false;
+                document.getElementById('rencanaKerja').required = false;
+                document.getElementById('tanggalWfaMasuk').required = false;
+                document.getElementById('pencapaianKerja').required = false;
+                document.getElementById('tanggalWfaPulang').required = false;
             }
 
             presensiSelect.addEventListener('change', function () {
@@ -655,34 +655,49 @@
                     sections.izin.classList.add('visible');
                     document.getElementById('tanggalMulaiIzin').required = true;
                     document.getElementById('tanggalAkhirIzin').required = true;
+                    document.getElementById('perihalIzin').required = true;
                 } else if (value === 'dinas-luar') {
                     sections.dinasLuar.classList.add('visible');
                     document.getElementById('tanggalPergi').required = true;
                     document.getElementById('tanggalPulang').required = true;
-                } else if (value === 'WFH') {
-                    sections.WFH.classList.add('visible');
-                    WFHPilihanSelect.value = "";
-                    sections.WFHMasuk.classList.remove('visible');
-                    sections.WFHPulang.classList.remove('visible');
-                    sections.WFHLink.classList.remove('visible');
+                    document.getElementById('kotaTujuan').required = true;
+                } else if (value === 'wfa') {
+                    sections.wfa.classList.add('visible');
+                    wfaPilihanSelect.value = "";
+                    wfaPilihanSelect.required = true;
+                    
+                    sections.wfaMasuk.classList.remove('visible');
+                    sections.wfaPulang.classList.remove('visible');
+                    sections.wfaLink.classList.remove('visible');
                 }
             });
 
-            WFHPilihanSelect.addEventListener('change', function () {
-                sections.WFHMasuk.classList.remove('visible');
-                sections.WFHPulang.classList.remove('visible');
-                sections.WFHLink.classList.remove('visible');
-                document.getElementById('linkGdriveWFH').required = false;
+            wfaPilihanSelect.addEventListener('change', function () {
+                sections.wfaMasuk.classList.remove('visible');
+                sections.wfaPulang.classList.remove('visible');
+                sections.wfaLink.classList.remove('visible');
+                
+                document.getElementById('linkGdriveWfa').required = false;
+                document.getElementById('rencanaKerja').required = false;
+                document.getElementById('tanggalWfaMasuk').required = false;
+                document.getElementById('pencapaianKerja').required = false;
+                document.getElementById('tanggalWfaPulang').required = false;
 
                 const value = this.value;
                 if (value === 'absensi-masuk') {
-                    sections.WFHMasuk.classList.add('visible');
-                    sections.WFHLink.classList.add('visible');
-                    document.getElementById('linkGdriveWFH').required = true;
+                    sections.wfaMasuk.classList.add('visible');
+                    sections.wfaLink.classList.add('visible');
+                    
+                    document.getElementById('linkGdriveWfa').required = true;
+                    document.getElementById('rencanaKerja').required = true;
+                    document.getElementById('tanggalWfaMasuk').required = true;
                 } else if (value === 'absensi-pulang') {
-                    sections.WFHPulang.classList.add('visible');
-                    sections.WFHLink.classList.add('visible');
-                    document.getElementById('linkGdriveWFH').required = true;
+                    sections.wfaPulang.classList.add('visible');
+                    sections.wfaLink.classList.add('visible');
+                    
+                    document.getElementById('linkGdriveWfa').required = true;
+                    document.getElementById('pencapaianKerja').required = true;
+                    document.getElementById('tanggalWfaPulang').required = true;
                 }
             });
 
@@ -703,7 +718,7 @@
                 const d2 = new Date(endVal);
                 if (d1 > d2) return 0;
                 const diffTime = Math.abs(d2 - d1);
-                return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Termasuk hari mulai
+                return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
             }
 
             [tglMulaiIzin, tglAkhirIzin].forEach(input => {
@@ -738,6 +753,55 @@
             });
 
             // =========================================================================
+            // FUNGSI VALIDASI FORM KETAT SEBELUM SUBMIT
+            // =========================================================================
+            function validateForm() {
+                const presensi = presensiSelect.value;
+                if (!presensi) {
+                    alert('Silakan pilih jenis laporan absensi terlebih dahulu.');
+                    return false;
+                }
+                
+                if (presensi === 'izin') {
+                    if (!document.getElementById('perihalIzin').value.trim() || 
+                        !document.getElementById('tanggalMulaiIzin').value || 
+                        !document.getElementById('tanggalAkhirIzin').value) {
+                        alert('Harap lengkapi semua bidang untuk laporan Izin (Perihal, Tanggal Mulai & Akhir).');
+                        return false;
+                    }
+                } else if (presensi === 'dinas-luar') {
+                    if (!document.getElementById('kotaTujuan').value.trim() || 
+                        !document.getElementById('tanggalPergi').value || 
+                        !document.getElementById('tanggalPulang').value) {
+                        alert('Harap lengkapi semua bidang untuk laporan Dinas Luar (Kota Tujuan, Tanggal Pergi & Pulang).');
+                        return false;
+                    }
+                } else if (presensi === 'wfa') {
+                    const wfaPilihan = wfaPilihanSelect.value;
+                    if (!wfaPilihan) {
+                        alert('Harap tentukan opsi Absensi WFA Anda (Absensi Masuk atau Absensi Pulang).');
+                        return false;
+                    }
+                    if (wfaPilihan === 'absensi-masuk') {
+                        if (!document.getElementById('rencanaKerja').value.trim() || 
+                            !document.getElementById('tanggalWfaMasuk').value ||
+                            !document.getElementById('linkGdriveWfa').value.trim()) {
+                            alert('Harap lengkapi rencana kerja, tanggal absensi, dan tautan Google Drive Laporan Kinerja.');
+                            return false;
+                        }
+                    } else if (wfaPilihan === 'absensi-pulang') {
+                        if (!document.getElementById('pencapaianKerja').value.trim() || 
+                            !document.getElementById('tanggalWfaPulang').value ||
+                            !document.getElementById('linkGdriveWfa').value.trim()) {
+                            alert('Harap lengkapi pencapaian kerja, tanggal absensi, dan tautan Google Drive Laporan Kinerja.');
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            // =========================================================================
             // SUBMIT FORM ABSENSI MANDIRI (TAB 1)
             // =========================================================================
             const form = document.getElementById('absensiForm');
@@ -752,6 +816,11 @@
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
 
+                // Lakukan validasi ketat terlebih dahulu
+                if (!validateForm()) {
+                    return;
+                }
+
                 submitButton.disabled = true;
                 buttonText.textContent = 'Memproses Lampiran Berkas...';
                 loadingSpinner.classList.remove('hidden');
@@ -762,7 +831,6 @@
                 if (presensiVal === 'izin') fileInput = document.getElementById('dokumenIzin');
                 else if (presensiVal === 'dinas-luar') fileInput = document.getElementById('dokumenDinas');
 
-                // Konversi berkas ke Base64 jika tersedia
                 if (fileInput && fileInput.files[0]) {
                     const file = fileInput.files[0];
                     const reader = new FileReader();
@@ -793,7 +861,6 @@
                     presensi: presensiSelect.value
                 };
 
-                // Susun parameter spesifik per jenis presensi
                 if (payload.presensi === 'izin') {
                     payload.perihalIzin = document.getElementById('perihalIzin').value;
                     payload.tanggal = document.getElementById('tanggalMulaiIzin').value;
@@ -804,15 +871,15 @@
                     payload.tanggalPergi = document.getElementById('tanggalPergi').value;
                     payload.tanggalPulang = document.getElementById('tanggalPulang').value;
                     payload.jumlahHari = getDaysDiff(payload.tanggalPergi, payload.tanggalPulang);
-                } else if (payload.presensi === 'WFH') {
-                    payload.WFHPilihan = WFHPilihanSelect.value;
-                    payload.linkGdriveWFH = document.getElementById('linkGdriveWFH').value;
-                    if (payload.WFHPilihan === 'absensi-masuk') {
+                } else if (payload.presensi === 'wfa') {
+                    payload.wfaPilihan = wfaPilihanSelect.value;
+                    payload.linkGdriveWfa = document.getElementById('linkGdriveWfa').value;
+                    if (payload.wfaPilihan === 'absensi-masuk') {
                         payload.keterangan = document.getElementById('rencanaKerja').value;
-                        payload.tanggal = document.getElementById('tanggalWFHMasuk').value;
-                    } else if (payload.WFHPilihan === 'absensi-pulang') {
+                        payload.tanggal = document.getElementById('tanggalWfaMasuk').value;
+                    } else if (payload.wfaPilihan === 'absensi-pulang') {
                         payload.keterangan = document.getElementById('pencapaianKerja').value;
-                        payload.tanggal = document.getElementById('tanggalWFHPulang').value;
+                        payload.tanggal = document.getElementById('tanggalWfaPulang').value;
                     }
                 }
 
@@ -820,7 +887,6 @@
                     payload.file = fileObject;
                 }
 
-                // Kirim data ke Google Apps Script (melalui CORS no-cors)
                 fetch(scriptURL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -831,7 +897,6 @@
                     successPegawaiName.textContent = payload.namaPegawai;
                     successModal.classList.remove('hidden');
 
-                    // Reset form visual
                     form.reset();
                     namaPegawaiSelect.disabled = true;
                     namaPegawaiSelect.className = "w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition duration-150 bg-slate-50 shadow-sm font-medium text-slate-800 disabled:opacity-60 disabled:cursor-not-allowed";
@@ -872,19 +937,16 @@
                 const bulanSelected = document.getElementById('rekapBulan').value;
                 const tahunSelected = document.getElementById('rekapTahun').value;
 
-                // 1. Validasi Password
                 const correctPassword = sandiWilayah[wilayahSelected];
                 if (sandiInputed !== correctPassword) {
                     alert('Kombinasi wilayah dan sandi administrator salah. Hak akses ditolak.');
                     return;
                 }
 
-                // 2. Kunci tombol dan jalankan loading animation
                 downloadBtn.disabled = true;
                 downloadBtn.firstElementChild.textContent = 'Menghubungi Server Google...';
                 downloadSpinner.classList.remove('hidden');
 
-                // 3. Tarik data detail dari database via GET Request
                 const requestUrl = `${scriptURL}?action=getAbsensi&year=${tahunSelected}&month=${bulanSelected}`;
 
                 fetch(requestUrl)
@@ -899,9 +961,7 @@
 
                     const allRows = result.data || [];
                     
-                    // Filter data hanya untuk Kabupaten / Kota terpilih
                     const filteredData = allRows.filter(row => {
-                        // Cari pegawai di database wilayah
                         const listPegawaiWilayah = dbPegawai[wilayahSelected] || [];
                         return listPegawaiWilayah.includes(row.NamaPegawai);
                     });
@@ -926,12 +986,8 @@
                 ];
                 const namaBulan = namaBulanMap[parseInt(bulan, 10) - 1];
 
-                // ---------------------------------------------------------
-                // SHEET 1: REKAPITULASI SUMMARY PER STAF
-                // ---------------------------------------------------------
                 const listPegawai = dbPegawai[wilayah] || [];
                 const rekapSummaryTable = listPegawai.map((pegawai, index) => {
-                    // Filter laporan khusus milik pegawai ini
                     const logsPegawai = detailLogs.filter(log => log.NamaPegawai === pegawai);
                     
                     const countLupa = logsPegawai.filter(log => log.JenisPresensi === "Lupa Absensi").length;
@@ -939,9 +995,15 @@
                     const countIzin = logsPegawai.filter(log => log.JenisPresensi === "Izin").length;
                     const countDinas = logsPegawai.filter(log => log.JenisPresensi === "Dinas Luar").length;
                     
-                    // Hitung sub WFH
-                    const countWFHMasuk = logsPegawai.filter(log => log.JenisPresensi === "WFH (Work From Home) / WFH" && log.JenisWFH === "Absensi Masuk (Rencana Kerja)").length;
-                    const countWFHPulang = logsPegawai.filter(log => log.JenisPresensi === "WFH (Work From Home) / WFH" && log.JenisWFH === "Absensi Pulang (Pencapaian Target)").length;
+                    const countWfaMasuk = logsPegawai.filter(log => 
+                        (log.JenisPresensi === "WFH (Work From Home) / WFA" || log.JenisPresensi === "Work From Anywhere (WFA) / WFH") && 
+                        log.JenisWFH === "Absensi Masuk (Rencana Kerja)"
+                    ).length;
+                    
+                    const countWfaPulang = logsPegawai.filter(log => 
+                        (log.JenisPresensi === "WFH (Work From Home) / WFA" || log.JenisPresensi === "Work From Anywhere (WFA) / WFH") && 
+                        log.JenisWFH === "Absensi Pulang (Pencapaian Target)"
+                    ).length;
 
                     const totalLaporan = logsPegawai.length;
 
@@ -952,15 +1014,12 @@
                         "Kendala Mesin": countKendala,
                         "Izin": countIzin,
                         "Dinas Luar": countDinas,
-                        "WFH Masuk": countWFHMasuk,
-                        "WFH Pulang": countWFHPulang,
+                        "WFA Masuk": countWfaMasuk,
+                        "WFA Pulang": countWfaPulang,
                         "Total Laporan": totalLaporan
                     };
                 });
 
-                // ---------------------------------------------------------
-                // SHEET 2: LOG DETAIL AKTIVITAS
-                // ---------------------------------------------------------
                 const detailLogsTable = detailLogs.map((log, index) => {
                     return {
                         "No": index + 1,
@@ -972,24 +1031,20 @@
                         "Akhir Tugas/Izin": log.TanggalSelesai || "",
                         "Durasi (Hari)": log.JumlahHari || "",
                         "Tujuan Dinas": log.KotaTujuan || "",
-                        "Sub WFH": log.JenisWFH || "",
+                        "Sub WFA": log.JenisWFH || "",
                         "Deskripsi / Keterangan": log.Keterangan || "",
                         "Tautan File Bukti": log.LinkFileDrive || ""
                     };
                 });
 
-                // Buat Workbook Baru
                 const wb = XLSX.utils.book_new();
 
-                // Ubah Array Object ke Sheet
                 const wsRekap = XLSX.utils.json_to_sheet(rekapSummaryTable);
                 const wsDetail = XLSX.utils.json_to_sheet(detailLogsTable);
 
-                // Masukkan Sheet ke dalam Workbook
                 XLSX.utils.book_append_sheet(wb, wsRekap, "Rekap Kehadiran");
                 XLSX.utils.book_append_sheet(wb, wsDetail, "Data Detail Laporan");
 
-                // Trigger Download File Excel
                 const fileName = `REKAP_ABSENSI_${wilayah.replace(/\s+/g, '_')}_${namaBulan.toUpperCase()}_${tahun}.xlsx`;
                 XLSX.writeFile(wb, fileName);
             }
