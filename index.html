@@ -95,8 +95,8 @@
                 <!-- JAM DIGITAL LIVE -->
                 <div class="bg-black/25 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-2xl flex items-center justify-between md:justify-end gap-4 shadow-lg min-w-[240px]">
                     <div class="text-left">
-                        <p id="liveDate" class="text-[10px] font-bold tracking-wider text-amber-300 uppercase">MEMUAT HARI...</p>
-                        <p id="liveYear" class="text-[11px] text-white/75 font-semibold">Memuat Tanggal...</p>
+                        <p id="liveDate" class="text-[10px] font-bold tracking-wider text-amber-300 uppercase">SELASA</p>
+                        <p id="liveYear" class="text-[11px] text-white/75 font-semibold">4 Agustus 2026</p>
                     </div>
                     <div class="h-8 w-px bg-white/10"></div>
                     <div class="text-right">
@@ -134,7 +134,7 @@
                     </div>
                     <div class="overflow-hidden relative w-full h-5 flex items-center">
                         <div id="tickerContent" class="text-amber-100 font-medium text-xs whitespace-nowrap transition-all duration-500 transform translate-y-0">
-                            Memutakhirkan data presensi hari ini...
+                            Sistem siap menerima laporan presensi.
                         </div>
                     </div>
                 </div>
@@ -153,8 +153,7 @@
 
                 <!-- STACKED GRID BADGES PER KABUPATEN (NO SCROLL) -->
                 <div id="kabupatenWfhContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 pt-0.5 text-xs">
-                    <!-- Cards populate dynamically via JS -->
-                    <div class="col-span-full text-amber-200/70 text-xs italic py-1 text-center">Memuat data WFH per kabupaten/kota...</div>
+                    <!-- Populated synchronously via JS -->
                 </div>
             </div>
         </div>
@@ -232,7 +231,6 @@
                             <option value="izin">Izin</option>
                             <option value="dinas-luar">Dinas Luar</option>
                             <option value="wfa">Work From Home (WFH)</option>
-                            <!-- Lupa Absensi dan Kendala Mesin disembunyikan dari visual namun ada dalam logika -->
                             <option value="lupa-absensi" style="display: none;">Lupa Absensi</option>
                             <option value="kendala-mesin" style="display: none;">Kendala Mesin Absensi</option>
                         </select>
@@ -411,7 +409,7 @@
                                 <option value="05">Mei</option>
                                 <option value="06">Juni</option>
                                 <option value="07">Juli</option>
-                                <option value="08">Agustus</option>
+                                <option value="08" selected>Agustus</option>
                                 <option value="09">September</option>
                                 <option value="10">Oktober</option>
                                 <option value="11">November</option>
@@ -488,6 +486,22 @@
             <p class="text-slate-700 font-semibold mt-1 text-sm"><span id="successPegawaiName" class="font-extrabold text-orange-600">Nama Pegawai</span></p>
             <button id="closeModalBtn" class="mt-6 w-full px-5 py-3 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 focus:outline-none transition duration-150">
                 Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL PERINGATAN ABSENSI DUPLIKAT -->
+    <div id="duplicateModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center border border-slate-100">
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-amber-50 border border-amber-200 mb-5 shadow-inner">
+                <i class="fa-solid fa-triangle-exclamation text-3xl text-amber-600"></i>
+            </div>
+            <h3 class="text-lg font-extrabold text-slate-800">Absensi Sudah Terdata</h3>
+            <p id="duplicateModalMessage" class="text-slate-600 mt-2.5 text-xs leading-relaxed font-medium">
+                Anda telah melakukan absensi pada sesi ini, silahkan lakukan absensi pada sesi berikut nya
+            </p>
+            <button id="closeDuplicateModalBtn" class="mt-6 w-full px-5 py-3 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl focus:outline-none transition duration-150">
+                Saya Mengerti
             </button>
         </div>
     </div>
@@ -591,7 +605,7 @@
                 "FAIZUL IKA", "DETRIANDI", "NAHRUL YAUMI", "RISA ANDAYANI", 
                 "RIVAL NOPIRI", "SAMIAH HASIBUAN", "SYAIFUL AMRI", "TENGKU ALI AKBAR", 
                 "YULIANA HASIBUAN", "RESMINA LUBIS", "RAHMAWATI SIREGAR", "RAYMOND RIZAL", 
-                "TENGKU ABDUL MANAP", "AFIS RIFYAL", "YAYANK PERDIAN", "UKHROY", "BUNGA KURNIA", "RIRIN SULPIANI", "BUNGA KURNIA", "M ZAUWIR ABDULLAH"
+                "TENGKU ABDUL MANAP", "AFIS RIFYAL", "YAYANK PERDIAN", "UKHROY", "BUNGA KURNIA"
             ],
             "Bawaslu Riau": [
                 "GUSHENDRI", "ASMIN SAFARI LUBIS", "TARMIZI", "RIZKI KURNIAWAN", 
@@ -616,7 +630,7 @@
                 "FEBRIKO", "FERDIAN", "CEPPY PRANA SHAKTI", "IRMA FHUDLA", 
                 "LIA ADRIANTI", "MARDHATILLAH MINUR", "MUHAMMAD DIRHAM", "MUHAMMAD YASLAN", 
                 "REZA M. IKHSAN", "YERI PURNAMA SARI", "MASROH", "YUSROH", 
-                "WINDA", "FERDINAN ROTUA PURBA", "KHENDRO", ", "WAN ELFYA DELIMA", "DARUL HUDA"
+                "WINDA", "FERDINAN ROTUA PURBA", "KHENDRO"
             ]
         };
 
@@ -657,37 +671,75 @@
             { key: "Bawaslu Siak", shortName: "Siak" }
         ];
 
-        // MAPPING STATISTIK REGIONAL REALTIME
+        // MAPPING STATISTIK REGIONAL REALTIME & LOCAL ATTENDANCE LOGS
         let regionalWfhStats = {};
+        let todayLogRecords = [];
 
-        // --- STREAMING_CHUNK:Initializing event listeners and clock components... ---
-        document.addEventListener('DOMContentLoaded', function() {
+        // INITIALIZE CLOCK IMMEDIATELY (SYNCHRONOUS)
+        function updateDigitalClock() {
+            const now = new Date();
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
             
-            // REAL TIME DIGITAL CLOCK COMPONENT
-            function updateDigitalClock() {
-                const now = new Date();
-                
-                const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-                const months = [
-                    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
-                    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-                ];
-                
-                const timeString = now.toLocaleTimeString('id-ID', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false
-                }).replace(/\./g, ':');
+            const timeString = now.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(/\./g, ':');
 
-                document.getElementById('liveTime').textContent = timeString;
-                document.getElementById('liveDate').textContent = days[now.getDay()];
-                document.getElementById('liveYear').textContent = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-            }
-            setInterval(updateDigitalClock, 1000);
+            const liveTimeEl = document.getElementById('liveTime');
+            const liveDateEl = document.getElementById('liveDate');
+            const liveYearEl = document.getElementById('liveYear');
+
+            if (liveTimeEl) liveTimeEl.textContent = timeString;
+            if (liveDateEl) liveDateEl.textContent = days[now.getDay()];
+            if (liveYearEl) liveYearEl.textContent = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+        }
+
+        // Run clock immediately on script load
+        setInterval(updateDigitalClock, 1000);
+        updateDigitalClock();
+
+        // RENDER KABUPATEN/KOTA WFH STATS
+        function renderKabupatenWfhStats() {
+            const container = document.getElementById('kabupatenWfhContainer');
+            if (!container) return;
+
+            let htmlContent = '';
+            listWilayah.forEach(w => {
+                const stats = regionalWfhStats[w.key] || { masuk: 0, pulang: 0 };
+                htmlContent += `
+                    <div class="flex items-center justify-between gap-1.5 bg-black/30 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 shadow-inner hover:border-amber-400/40 transition duration-150">
+                        <span class="font-bold text-amber-200 text-[11px] truncate" title="${w.shortName}">${w.shortName}:</span>
+                        <div class="flex items-center gap-1 text-[10px] shrink-0">
+                            <span class="px-1.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-semibold flex items-center gap-0.5" title="WFH Masuk">
+                                <i class="fa-solid fa-right-to-bracket text-[8px]"></i>M:<b class="text-white font-extrabold">${stats.masuk}</b>
+                            </span>
+                            <span class="px-1.5 py-0.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-400/30 font-semibold flex items-center gap-0.5" title="WFH Pulang">
+                                <i class="fa-solid fa-right-from-bracket text-[8px]"></i>P:<b class="text-white font-extrabold">${stats.pulang}</b>
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // Populate zero stats synchronously first so UI is never blank
+        listWilayah.forEach(w => {
+            regionalWfhStats[w.key] = { masuk: 0, pulang: 0 };
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
             updateDigitalClock();
+            renderKabupatenWfhStats();
 
-            // --- TICKER & TODAY'S ATTENDANCE STATS ENGINE ---
+            // TICKER & TODAY'S ATTENDANCE STATS ENGINE
             let recentSubmissions = [];
             let tickerIndex = 0;
             let tickerInterval = null;
@@ -697,11 +749,10 @@
                 if (!tickerEl) return;
 
                 if (recentSubmissions.length === 0) {
-                    tickerEl.innerHTML = `<span class="text-amber-200/80 italic">Belum ada presensi terdata hari ini.</span>`;
+                    tickerEl.innerHTML = `<span class="text-amber-200/80 italic">Sistem siap menerima laporan presensi hari ini.</span>`;
                     return;
                 }
 
-                // Smooth fade-slide animation
                 tickerEl.style.opacity = '0';
                 tickerEl.style.transform = 'translateY(-6px)';
 
@@ -724,46 +775,24 @@
                 return String(str || "").toLowerCase().replace(/[^a-z0-9]/g, '');
             }
 
-            function renderKabupatenWfhStats() {
-                const container = document.getElementById('kabupatenWfhContainer');
-                if (!container) return;
-
-                let htmlContent = '';
-                listWilayah.forEach(w => {
-                    const stats = regionalWfhStats[w.key] || { masuk: 0, pulang: 0 };
-                    htmlContent += `
-                        <div class="flex items-center justify-between gap-1.5 bg-black/30 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 shadow-inner hover:border-amber-400/40 transition duration-150">
-                            <span class="font-bold text-amber-200 text-[11px] truncate" title="${w.shortName}">${w.shortName}:</span>
-                            <div class="flex items-center gap-1 text-[10px] shrink-0">
-                                <span class="px-1.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-semibold flex items-center gap-0.5" title="WFH Masuk">
-                                    <i class="fa-solid fa-right-to-bracket text-[8px]"></i>M:<b class="text-white font-extrabold">${stats.masuk}</b>
-                                </span>
-                                <span class="px-1.5 py-0.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-400/30 font-semibold flex items-center gap-0.5" title="WFH Pulang">
-                                    <i class="fa-solid fa-right-from-bracket text-[8px]"></i>P:<b class="text-white font-extrabold">${stats.pulang}</b>
-                                </span>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                container.innerHTML = htmlContent;
-            }
-
             function loadTodayStats() {
                 const now = new Date();
                 const year = now.getFullYear();
                 const month = String(now.getMonth() + 1).padStart(2, '0');
                 const todayFormatted = `${String(now.getDate()).padStart(2, '0')}/${month}/${year}`;
 
-                // Reset stats
                 listWilayah.forEach(w => {
                     regionalWfhStats[w.key] = { masuk: 0, pulang: 0 };
                 });
+
+                // Render defaults immediately before fetch
+                renderKabupatenWfhStats();
 
                 fetch(`${scriptURL}?action=getAbsensi&year=${year}&month=${month}`)
                     .then(res => res.json())
                     .then(res => {
                         if (res.status === 'success' && Array.isArray(res.data)) {
+                            todayLogRecords = res.data;
                             const todayData = res.data.filter(item => {
                                 const ts = String(item.Timestamp || '');
                                 const tk = String(item.TanggalKejadian || '');
@@ -773,7 +802,6 @@
 
                             document.getElementById('todayCountBadge').textContent = todayData.length;
 
-                            // Hitung Statistik WFH Masuk & Pulang per Kabupaten/Kota
                             todayData.forEach(item => {
                                 const jp = String(item.JenisPresensi || '').toLowerCase();
                                 const jw = String(item.JenisWFH || '').toLowerCase();
@@ -781,8 +809,6 @@
 
                                 if (isWfh) {
                                     const namaPeg = normalizeName(item.NamaPegawai);
-                                    
-                                    // Cari Wilayah Pegawai
                                     let matchedKey = null;
                                     for (const wKey of Object.keys(dbPegawai)) {
                                         if (dbPegawai[wKey].some(p => normalizeName(p) === namaPeg)) {
@@ -818,6 +844,7 @@
                             startTickerLoop();
                         } else {
                             renderKabupatenWfhStats();
+                            startTickerLoop();
                         }
                     })
                     .catch(err => {
@@ -835,20 +862,16 @@
             const tabInputContent = document.getElementById('tabInputContent');
             const tabRekapContent = document.getElementById('tabRekapContent');
 
-            // Switch to Input Absensi Tab
             tabInputBtn.addEventListener('click', () => {
                 tabInputContent.classList.add('active');
                 tabRekapContent.classList.remove('active');
-                
                 tabInputBtn.className = "flex-1 py-3 px-4 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 bg-orange-600 text-white shadow-md shadow-orange-600/10";
                 tabRekapBtn.className = "flex-1 py-3 px-4 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 flex items-center justify-center gap-2 transition-all duration-200";
             });
 
-            // Switch to Unduh Rekap Tab
             tabRekapBtn.addEventListener('click', () => {
                 tabRekapContent.classList.add('active');
                 tabInputContent.classList.remove('active');
-                
                 tabRekapBtn.className = "flex-1 py-3 px-4 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 bg-orange-600 text-white shadow-md shadow-orange-600/10";
                 tabInputBtn.className = "flex-1 py-3 px-4 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 flex items-center justify-center gap-2 transition-all duration-200";
             });
@@ -886,8 +909,6 @@
 
             presensiSelect.addEventListener('change', function() {
                 const val = this.value;
-                
-                // Reset all states
                 Object.values(sections).forEach(sec => sec.classList.remove('visible'));
                 
                 if (val === 'izin') {
@@ -920,7 +941,6 @@
                 }
             });
 
-            // --- STREAMING_CHUNK:Calculating calendar days dynamically... ---
             // CALCULATE TOTAL DAYS ON LIVE COUNTERS
             const tglMulaiIzin = document.getElementById('tanggalMulaiIzin');
             const tglAkhirIzin = document.getElementById('tanggalAkhirIzin');
@@ -968,8 +988,41 @@
                 }
             });
 
-            // --- STREAMING_CHUNK:Handling form submit and client side validation logic... ---
-            // CLIENT-SIDE VALIDATION AND BASE64 FILE HANDLING ON SUBMIT
+            // DUPLICATE CHECK MODAL HELPERS
+            const duplicateModal = document.getElementById('duplicateModal');
+            const closeDuplicateModalBtn = document.getElementById('closeDuplicateModalBtn');
+
+            if (closeDuplicateModalBtn) {
+                closeDuplicateModalBtn.addEventListener('click', () => {
+                    duplicateModal.classList.add('hidden');
+                });
+            }
+
+            function isDuplicateSubmission(nama, targetDate, presensiType, wfaOption) {
+                const targetNormName = normalizeName(nama);
+                
+                // Check recent submissions in local session memory
+                for (const rec of todayLogRecords) {
+                    if (normalizeName(rec.NamaPegawai) === targetNormName) {
+                        const recPresensi = String(rec.JenisPresensi || '').toLowerCase();
+                        const recWfhOption = String(rec.JenisWFH || '').toLowerCase();
+                        const recDate = String(rec.TanggalKejadian || rec.TanggalMulai || rec.Timestamp || '');
+
+                        if (recDate.includes(targetDate) || targetDate === '') {
+                            if (presensiType === 'wfa' || presensiType === 'wfh') {
+                                if (wfaOption && recWfhOption.includes(wfaOption.replace('absensi-', ''))) {
+                                    return true;
+                                }
+                            } else if (recPresensi.includes(presensiType)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            // CLIENT-SIDE VALIDATION AND SUBMIT
             const form = document.getElementById('absensiForm');
             const submitBtn = document.getElementById('submitBtn');
             const submitBtnText = document.getElementById('submitBtnText');
@@ -978,21 +1031,25 @@
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
-                // Advanced Client Validation to prevent Empty submissions
                 const presensi = presensiSelect.value;
+                let targetDate = '';
+                let wfaOption = '';
+
                 if (presensi === 'wfa') {
-                    const option = wfaPilihanSelect.value;
-                    if (!option) {
+                    wfaOption = wfaPilihanSelect.value;
+                    if (!wfaOption) {
                         alert('Silakan pilih opsi Absensi WFH (Absensi Masuk atau Pulang) terlebih dahulu!');
                         return;
                     }
-                    if (option === 'absensi-masuk') {
-                        if (!document.getElementById('rencanaKerja').value.trim() || !document.getElementById('tanggalWfaMasuk').value) {
+                    if (wfaOption === 'absensi-masuk') {
+                        targetDate = document.getElementById('tanggalWfaMasuk').value;
+                        if (!document.getElementById('rencanaKerja').value.trim() || !targetDate) {
                             alert('Silakan isi butir Rencana Kerja dan Tanggal Absensi WFH Anda!');
                             return;
                         }
-                    } else if (option === 'absensi-pulang') {
-                        if (!document.getElementById('pencapaianKerja').value.trim() || !document.getElementById('tanggalWfaPulang').value) {
+                    } else if (wfaOption === 'absensi-pulang') {
+                        targetDate = document.getElementById('tanggalWfaPulang').value;
+                        if (!document.getElementById('pencapaianKerja').value.trim() || !targetDate) {
                             alert('Silakan isi rincian Pencapaian Kerja dan Tanggal Absensi WFH Anda!');
                             return;
                         }
@@ -1002,23 +1059,29 @@
                         return;
                     }
                 } else if (presensi === 'izin') {
-                    if (!document.getElementById('perihalIzin').value.trim() || !tglMulaiIzin.value || !tglAkhirIzin.value) {
+                    targetDate = tglMulaiIzin.value;
+                    if (!document.getElementById('perihalIzin').value.trim() || !targetDate || !tglAkhirIzin.value) {
                         alert('Silakan lengkapi data perihal izin dan rentang tanggalnya!');
                         return;
                     }
                 } else if (presensi === 'dinas-luar') {
-                    if (!document.getElementById('kotaTujuan').value.trim() || !tglPergi.value || !tglPulang.value) {
+                    targetDate = tglPergi.value;
+                    if (!document.getElementById('kotaTujuan').value.trim() || !targetDate || !tglPulang.value) {
                         alert('Silakan isi data kota tujuan serta rentang tanggal dinas luar!');
                         return;
                     }
                 }
 
-                // Lock button & show loaders
+                // Check duplicate submission
+                if (isDuplicateSubmission(namaPegawaiSelect.value, targetDate, presensi, wfaOption)) {
+                    duplicateModal.classList.remove('hidden');
+                    return;
+                }
+
                 submitBtn.disabled = true;
                 submitBtnText.textContent = 'Memproses Berkas...';
                 submitSpinner.classList.remove('hidden');
 
-                // Process Attachments (File uploads)
                 let activeFileInput = null;
                 if (presensi === 'izin') activeFileInput = document.getElementById('dokumenIzin');
                 else if (presensi === 'dinas-luar') activeFileInput = document.getElementById('dokumenDinas');
@@ -1040,7 +1103,6 @@
                 }
             });
 
-            // --- STREAMING_CHUNK:Sending package to script database server... ---
             function sendDataToServer(fileObject) {
                 submitBtnText.textContent = 'Mengirim Laporan Absensi...';
                 const presensi = presensiSelect.value;
@@ -1077,6 +1139,15 @@
                     payload.file = fileObject;
                 }
 
+                // Add record to memory for duplicate prevention
+                todayLogRecords.push({
+                    NamaPegawai: payload.namaPegawai,
+                    JenisPresensi: payload.presensi,
+                    JenisWFH: payload.wfaPilihan || '',
+                    TanggalKejadian: payload.tanggal || payload.tanggalPergi || '',
+                    Timestamp: new Date().toLocaleDateString('id-ID')
+                });
+
                 fetch(scriptURL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -1087,14 +1158,12 @@
                     document.getElementById('successPegawaiName').textContent = payload.namaPegawai;
                     document.getElementById('successModal').classList.remove('hidden');
                     
-                    // Live Update Infografis Counter & Ticker Header
                     const countBadge = document.getElementById('todayCountBadge');
                     if (countBadge) {
                         const currentCount = parseInt(countBadge.textContent || '0', 10);
                         countBadge.textContent = currentCount + 1;
                     }
 
-                    // Live Update Statistik WFH Per Kabupaten / Kota
                     if (payload.presensi === 'wfa' || payload.presensi === 'wfh') {
                         const wKey = payload.kabupatenKota;
                         if (!regionalWfhStats[wKey]) {
@@ -1143,7 +1212,6 @@
                 document.getElementById('successModal').classList.add('hidden');
             });
 
-            // --- STREAMING_CHUNK:Configuring export-to-excel functionality and local data process... ---
             // EXCEL BUILDER ENGINE AND PASSWORD SECURITY CHECKS
             const rekapForm = document.getElementById('rekapForm');
             const downloadBtn = document.getElementById('downloadBtn');
@@ -1162,20 +1230,17 @@
                 const tahun = document.getElementById('rekapTahun').value;
                 const sandi = rekapPassword.value.trim();
 
-                // 1. Password validation check locally
                 if (sandiWilayah[wilayah] !== sandi) {
                     alert('Sandi Administrator Wilayah yang Anda masukkan tidak cocok / salah!');
                     return;
                 }
 
-                // 2. Lock UI & activate loading progress
                 downloadBtn.disabled = true;
                 downloadBtnText.textContent = 'Mengekstrak Data...';
                 progressContainer.classList.remove('hidden');
                 
                 updateProgress(20, 'Menghubungkan ke server database Bawaslu Riau...');
 
-                // 3. Request data from GAS (getAbsensi action)
                 const fetchUrl = `${scriptURL}?action=getAbsensi&year=${tahun}&month=${bulan}`;
                 
                 setTimeout(() => {
@@ -1214,7 +1279,6 @@
                 progressPercentage.textContent = '0%';
             }
 
-            // PROCESS AND EXPORT DOUBLE-SHEET WORKBOOK USING SHEETJS LOCAL COMPILER
             function processAndExportExcel(wilayah, bulan, tahun, rawLogs) {
                 const namaBulanMap = [
                     "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
@@ -1222,21 +1286,14 @@
                 ];
                 const namaBulan = namaBulanMap[parseInt(bulan, 10) - 1];
 
-                // Pencocokan Nama Pegawai secara fleksibel (mengabaikan titik & spasi ganda)
-                function normalizeName(str) {
-                    return String(str || "").toLowerCase().replace(/[^a-z0-9]/g, '');
-                }
-
                 const listPegawaiWilayah = dbPegawai[wilayah] || [];
 
-                // Filter log yang cocok dengan pegawai wilayah ini
                 const filteredLogs = rawLogs.filter(log => {
                     if (!log.NamaPegawai) return false;
                     const logNorm = normalizeName(log.NamaPegawai);
                     return listPegawaiWilayah.some(peg => normalizeName(peg) === logNorm);
                 });
 
-                // SHEET 1: REKAPITULASI SUMMARY TABLE
                 const summarySheetData = listPegawaiWilayah.map((pegawai, idx) => {
                     const pegNorm = normalizeName(pegawai);
                     const logsPeg = filteredLogs.filter(log => normalizeName(log.NamaPegawai) === pegNorm);
@@ -1269,7 +1326,6 @@
                     };
                 });
 
-                // SHEET 2: DETAIL ACTIVITY RECORDS LOGS
                 const detailSheetData = filteredLogs.map((log, idx) => {
                     let jenisPresensiDetail = log.JenisPresensi || "";
                     if (log.JenisWFH) {
@@ -1292,17 +1348,13 @@
                     };
                 });
 
-                // Create Sheets
                 const wb = XLSX.utils.book_new();
-                
                 const wsSummary = XLSX.utils.json_to_sheet(summarySheetData);
                 const wsDetail = XLSX.utils.json_to_sheet(detailSheetData);
 
-                // Append Sheets to Workbook
                 XLSX.utils.book_append_sheet(wb, wsSummary, "Ringkasan Rekap");
                 XLSX.utils.book_append_sheet(wb, wsDetail, "Data Detail Aktivitas");
 
-                // Execute write file locally
                 updateProgress(100, 'Berhasil mengekspor berkas!');
                 
                 setTimeout(() => {
